@@ -66,7 +66,6 @@ public class Server {
             }
         });
         server.addEventListener("send", Message.class, new DataListener<Message>() {
-
             @Override
             public void onData(SocketIOClient client, Message data, AckRequest ackSender) throws Exception {
                 System.out.println("onSend: " + data.toString());
