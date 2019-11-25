@@ -62,7 +62,7 @@ window.onload = function () {
         if (name.value == "") {
             alert("Please type your name!");
         } else {
-            var text = message.value;
+            var text = this.innerHTML;
             console.log(name.value + ': ' + text);
             socket.emit('send', {message: text, name: name.value});
         }
