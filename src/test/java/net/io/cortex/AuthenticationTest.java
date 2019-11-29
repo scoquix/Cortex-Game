@@ -1,4 +1,4 @@
-package net.cortex.chat;
+package net.io.cortex;
 
 import org.junit.jupiter.api.Test;
 
