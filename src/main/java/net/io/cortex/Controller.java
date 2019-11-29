@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.cortex.chat;
+package net.io.cortex;
 
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.Configuration;
@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * @author Unknown
  */
-public class Server {
+public class Controller {
 
 
     static int range = 10;
@@ -54,9 +54,9 @@ public class Server {
             @Override
             public void onConnect(SocketIOClient client) {
                 System.out.println("onConnected");
-                client.sendEvent("message", new Message("", "Welcome to the chat!"));
-                client.sendEvent("message", new Message("GameBot", "Ile jest " + a + "+" + b + " ?"));
-                client.sendEvent("wrongAnswers", new Message("", wrongAnswers[0] + " " + wrongAnswers[1] + " " + wrongAnswers[2] + " " + rightAnswer[0]));
+                client.sendEvent("message", new Message("", "Welcome to the Cortex!"));
+                //client.sendEvent("message", new Message("GameBot", "Ile jest " + a + "+" + b + " ?"));
+                //client.sendEvent("wrongAnswers", new Message("", wrongAnswers[0] + " " + wrongAnswers[1] + " " + wrongAnswers[2] + " " + rightAnswer[0]));
             }
         });
         server.addDisconnectListener(new DisconnectListener() {
@@ -81,6 +81,25 @@ public class Server {
                     server.getBroadcastOperations().sendEvent("wrongAnswers", new Message("", wrongAnswers[0] + " " + wrongAnswers[1] + " " + wrongAnswers[2] + " " + rightAnswer[0]));
                 }
 
+            }
+        });
+        server.addEventListener("logging", Authentication.class, new DataListener<Authentication>() {
+            @Override
+            public void onData(SocketIOClient socketIOClient, Authentication authentication, AckRequest ackRequest) throws Exception {
+                System.out.println("Logging start");
+                Authentication auth = new Authentication(authentication.getLogin(), authentication.getPassword());
+                if (auth.logging()) {
+                    socketIOClient.sendEvent("auth", "true");
+                } else {
+                    socketIOClient.sendEvent("auth", "false");
+                }
+            }
+        });
+
+        server.addEventListener("register", Registration.class, new DataListener<Registration>() {
+            @Override
+            public void onData(SocketIOClient socketIOClient, Registration register, AckRequest ackRequest) throws Exception {
+                Registration reg = new Registration(register.getLogin(), register.getPassword());
             }
         });
         System.out.println("Starting server...");

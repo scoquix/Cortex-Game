@@ -1,13 +1,8 @@
 window.onload = function () {
 
     var messages = [];
-    var answers = [];
     var message = document.getElementById("message");
     var sendButton = document.getElementById("send");
-    var answerButtonA = document.getElementById("buttonA");
-    var answerButtonB = document.getElementById("buttonB");
-    var answerButtonC = document.getElementById("buttonC");
-    var answerButtonD = document.getElementById("buttonD");
     var content = document.getElementById("content");
     var name = document.getElementById("name");
 
@@ -34,20 +29,6 @@ window.onload = function () {
             console.log("There is a problem:", data);
         }
     });
-    socket.on("wrongAnswers", function (data) {
-        if (data) {
-            var tmp = data.message.split(" ");
-            answers=tmp;
-            //answers.push(tmp);
-            console.log(answers);
-            answerButtonA.innerHTML = tmp[0];
-            answerButtonB.innerHTML = tmp[1];
-            answerButtonC.innerHTML = tmp[2];
-            answerButtonD.innerHTML = tmp[3];
-        } else {
-            console.log("There is a problem with wrong answers:", data);
-        }
-    });
 
     sendButton.onclick = function () {
         if (name.value == "") {
@@ -58,41 +39,5 @@ window.onload = function () {
             socket.emit('send', {message: text, name: name.value});
         }
     };
-    answerButtonA.onclick = function () {
-        if (name.value == "") {
-            alert("Please type your name!");
-        } else {
-            var text = this.innerHTML;
-            console.log(name.value + ': ' + text);
-            socket.emit('send', {message: text, name: name.value});
-        }
-    };
 
-    answerButtonB.onclick = function () {
-        if (name.value == "") {
-            alert("Please type your name!");
-        } else {
-            var text = this.innerHTML;
-            console.log(name.value + ': ' + text);
-            socket.emit('send', {message: text, name: name.value});
-        }
-    };
-    answerButtonC.onclick = function () {
-        if (name.value == "") {
-            alert("Please type your name!");
-        } else {
-            var text = this.innerHTML;
-            console.log(name.value + ': ' + text);
-            socket.emit('send', {message: text, name: name.value});
-        }
-    };
-    answerButtonD.onclick = function () {
-        if (name.value == "") {
-            alert("Please type your name!");
-        } else {
-            var text = this.innerHTML;
-            console.log(name.value + ': ' + text);
-            socket.emit('send', {message: text, name: name.value});
-        }
-    };
 }
