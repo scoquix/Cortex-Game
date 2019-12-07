@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package net.io.cortex;
+package net.io.cortex.model;
 
 /**
  * @author Unknown
@@ -12,7 +12,7 @@ public class Message {
     private String name;
     private String message;
 
-    //ważne
+    //Bardzo ważne
     public Message() {
     }
 
@@ -25,7 +25,7 @@ public class Message {
         return name;
     }
 
-    public void setName(String name) {
+    void setName(String name) {
         this.name = name;
     }
 
@@ -33,7 +33,7 @@ public class Message {
         return message;
     }
 
-    public void setMessage(String message) {
+    void setMessage(String message) {
         this.message = message;
     }
 

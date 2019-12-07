@@ -1,23 +1,32 @@
-package net.io.cortex;
+package net.io.cortex.model;
+
+import net.io.cortex.repository.UserRepositoryMongoImpl;
 
 public class Registration {
     private String login;
     private String password;
+
+    Registration() {
+    }
 
     public Registration(String login, String password) {
         this.login = login;
         this.password = password;
     }
 
+
     public boolean register() {
-        return true;
+        //Validation.validateLogin(this.getLogin());
+        //Validation.validatePassword(this.getPassword());
+        UserRepositoryMongoImpl userRepositoryMongo = new UserRepositoryMongoImpl();
+        return userRepositoryMongo.create(this);
     }
 
     public String getLogin() {
         return login;
     }
 
-    public void setLogin(String login) {
+    void setLogin(String login) {
         this.login = login;
     }
 
@@ -25,7 +34,7 @@ public class Registration {
         return password;
     }
 
-    public void setPassword(String password) {
+    void setPassword(String password) {
         this.password = password;
     }
 }

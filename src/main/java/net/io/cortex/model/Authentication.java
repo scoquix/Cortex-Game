@@ -1,10 +1,10 @@
-package net.io.cortex;
+package net.io.cortex.model;
 
 public class Authentication {
     private String login;
     private String password;
 
-    public Authentication() {
+    Authentication() {
     }
 
     public Authentication(String login, String password) {
@@ -16,7 +16,7 @@ public class Authentication {
         return login;
     }
 
-    public void setLogin(String login) {
+    void setLogin(String login) {
         this.login = login;
     }
 
@@ -24,7 +24,7 @@ public class Authentication {
         return password;
     }
 
-    public void setPassword(String password) {
+    void setPassword(String password) {
         this.password = password;
     }
 
