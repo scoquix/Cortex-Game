@@ -1,4 +1,4 @@
-package net.io.cortex;
+package net.io.cortex.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

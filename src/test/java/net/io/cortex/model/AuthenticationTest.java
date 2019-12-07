@@ -1,4 +1,4 @@
-package net.io.cortex;
+package net.io.cortex.model;
 
 import org.junit.jupiter.api.Test;
 
