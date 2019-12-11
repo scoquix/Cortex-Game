@@ -1,8 +1,5 @@
 package net.io.cortex.repository;
 
-import net.io.cortex.model.Authentication;
-import net.io.cortex.model.Registration;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -11,11 +8,11 @@ public interface UserRepository {
 
     Optional<String> findById(String id);
 
-    Optional<String> findByName(String name);
+    Optional<String> findByName(String id);
 
-    boolean delete(Authentication user);
+    void delete(String id);
 
-    boolean create(Registration id);
+    void create(String id);
 
-    boolean update(Authentication user);
+    void update(String id);
 }
