@@ -62,9 +62,12 @@ public class UserRepositoryMongoImpl implements UserRepository {
     public boolean delete(Authentication user) {
         if (user != null) {
             MongoCollection<Document> collection = openMongoDbCollection("test");
+            if (!findByName(user.getLogin()).isPresent())
+                return false;
 
-            //The following example deletes at most one document that meets the filter i equals 110:
-            collection.deleteOne(eq("i", 110));
+            //The following example deletes at most one document that meets the filter name equals user.getLogin()
+            collection.deleteOne(eq("name", user.getLogin()));
+            return true;
         }
         return false;
     }
@@ -100,13 +103,16 @@ public class UserRepositoryMongoImpl implements UserRepository {
 
     @Override
     public boolean update(Authentication user) {
-        MongoCollection<Document> collection = openMongoDbCollection("test");
-        Document doc = new Document("name", user.getLogin())
-                .append("password", user.getPassword())
-                .append("versions", Arrays.asList("v3.2", "v3.0", "v2.6"))
-                .append("info", new Document("x", 203).append("y", 102));
+        if (user != null) {
+            MongoCollection<Document> collection = openMongoDbCollection("test");
+            Document doc = new Document("name", user.getLogin())
+                    .append("password", user.getPassword())
+                    .append("versions", Arrays.asList("v3.2", "v3.0", "v2.6"))
+                    .append("info", new Document("x", 203).append("y", 102));
 
-        collection.insertOne(doc);
+            collection.insertOne(doc);
+            return true;
+        }
         return false;
     }
     private MongoCollection<Document> openMongoDbCollection(String name) {

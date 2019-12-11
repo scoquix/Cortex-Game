@@ -16,6 +16,7 @@ public class Registration {
 
 
     public boolean register() {
+        //CZEKAMY NA CB SEBA XD
         //Validation.validateLogin(this.getLogin());
         //Validation.validatePassword(this.getPassword());
         UserRepositoryMongoImpl userRepositoryMongo = new UserRepositoryMongoImpl();

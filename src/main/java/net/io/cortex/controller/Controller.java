@@ -81,12 +81,12 @@ public class Controller {
         });
 
         server.addEventListener("register", Registration.class, (socketIOClient, message, ackRequest) -> {
-            System.out.println("Jestem");
+            System.out.println("Server odebral event register");
             Registration reg = new Registration(message.getLogin(), message.getPassword());
             if (reg.register()) {
-                socketIOClient.sendEvent("register", "Julka działa xD");
+                socketIOClient.sendEvent("eventRegister", new Message("Server", "Registration completed"));
             } else {
-                socketIOClient.sendEvent("register", "false");
+                socketIOClient.sendEvent("eventRegister", new Message("Server", "Something went wrong :( - Database do not create user"));
             }
         });
         System.out.println("Starting server...");

@@ -45,7 +45,8 @@ window.onload = function () {
     });
 
     sendButton.onclick = function () {
-        if (name.value.localeCompare("")) {
+        console.log(name.value)
+        if (name.value == "") {
             alert("Please type your name!");
         } else {
             var text = message.value;
