@@ -29,15 +29,30 @@ window.onload = function () {
             console.log("There is a problem:", data);
         }
     });
+    socket.on('eventRegister', function (data) {
+        if (data.message) {
+            messages.push(data);
+            var html = '';
+            for (var i = 0; i < messages.length; i++) {
+                html += '<b>' + (messages[i].name ? messages[i].name : 'Server') + ': </b>';
+                html += messages[i].message + '<br />';
+            }
+            content.innerHTML = html;
+            content.scrollTop = content.scrollHeight;
+        } else {
+            console.log("There is a problem:", data);
+        }
+    });
 
     sendButton.onclick = function () {
+        console.log(name.value)
         if (name.value == "") {
             alert("Please type your name!");
         } else {
             var text = message.value;
             console.log(name.value + ': ' + text);
-            socket.emit('send', {message: text, name: name.value});
+            //socket.emit('send', {name: text, message: name.value});
+            socket.emit('register', {login: text, password: name.value});
         }
     };
-
-}
+};

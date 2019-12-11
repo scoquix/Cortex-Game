@@ -4,6 +4,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import net.io.cortex.model.Authentication;
+import net.io.cortex.model.Registration;
 import org.bson.Document;
 import org.junit.platform.commons.util.StringUtils;
 
@@ -22,8 +24,9 @@ public class UserRepositoryMongoImpl implements UserRepository {
         MongoCursor<Document> cursor = collection.find().iterator();
         try {
             while (cursor.hasNext()) {
-                System.out.println(cursor.next().toJson());
-                allUsers.add(cursor.next().toJson());
+                String line = cursor.next().toJson();
+                System.out.println(line);
+                allUsers.add(line);
             }
         } finally {
             cursor.close();
@@ -39,32 +42,37 @@ public class UserRepositoryMongoImpl implements UserRepository {
         MongoCollection<Document> collection = openMongoDbCollection("test");
         Document myDoc = collection.find(eq("id", id)).first();
 
-        return Optional.ofNullable(myDoc.toJson().toString());
+        return Optional.ofNullable(myDoc.toJson());
     }
 
     @Override
-    public Optional<String> findByName(String id) {
-        if (StringUtils.isBlank(id)) {
+    public Optional<String> findByName(String name) {
+        if (StringUtils.isBlank(name)) {
             return Optional.empty();
         }
         MongoCollection<Document> collection = openMongoDbCollection("test");
-        Document myDoc = collection.find(eq("id", id)).first();
-
-        return Optional.ofNullable(myDoc.toJson().toString());
-    }
-
-    @Override
-    public void delete(String id) {
-        if (!StringUtils.isBlank(id)) {
-            MongoCollection<Document> collection = openMongoDbCollection("test");
-
-            //The following example deletes at most one document that meets the filter i equals 110:
-            collection.deleteOne(eq("i", 110));
+        Document myDoc = collection.find(eq("name", name)).first();
+        if (!Optional.ofNullable(myDoc).isPresent()) {
+            return Optional.empty();
         }
+        return Optional.ofNullable(myDoc.toJson());
     }
 
     @Override
-    public void create(String id) {
+    public boolean delete(Authentication user) {
+        if (user != null) {
+            MongoCollection<Document> collection = openMongoDbCollection("test");
+            if (!findByName(user.getLogin()).isPresent())
+                return false;
+
+            //The following example deletes at most one document that meets the filter name equals user.getLogin()
+            collection.deleteOne(eq("name", user.getLogin()));
+            return true;
+        }
+        return false;
+    }
+    @Override
+    public boolean create(Registration user) {
         //instance running on localhost on port 27017
         //MongoClient mongoClient = new MongoClient();
         MongoClient mongoClient = new MongoClient("localhost", 27017);
@@ -77,32 +85,39 @@ public class UserRepositoryMongoImpl implements UserRepository {
         //If a collection does not exist, MongoDB creates the collection when you first store data for that collection.
         MongoCollection<Document> collection = database.getCollection("test");
 
-        Document doc = new Document("name", "MongoDB")
-                .append("type", "database")
-                .append("count", 1)
-                .append("versions", Arrays.asList("v3.2", "v3.0", "v2.6"))
-                .append("info", new Document("x", 203).append("y", 102));
+        Document doc = new Document("name", user.getLogin())
+                .append("password", user.getPassword())
+                .append("type", (user.getLogin() != null && user.getLogin().equals("admin")) ? "admin" : "user");
+        Optional<String> userInBase = findByName(user.getLogin());
 
-        collection.insertOne(doc);
+        if (userInBase.isPresent()) {
+            System.out.println("User " + user.getLogin() + " jest juz w bazie");
+            return false;
+        } else {
+            collection.insertOne(doc);
+            mongoClient.close();
+            return true;
+        }
+
     }
 
     @Override
-    public void update(String id) {
-        MongoCollection<Document> collection = openMongoDbCollection("test");
-        Document doc = new Document("name", "MongoDB")
-                .append("type", "database")
-                .append("count", 1)
-                .append("versions", Arrays.asList("v3.2", "v3.0", "v2.6"))
-                .append("info", new Document("x", 203).append("y", 102));
+    public boolean update(Authentication user) {
+        if (user != null) {
+            MongoCollection<Document> collection = openMongoDbCollection("test");
+            Document doc = new Document("name", user.getLogin())
+                    .append("password", user.getPassword())
+                    .append("versions", Arrays.asList("v3.2", "v3.0", "v2.6"))
+                    .append("info", new Document("x", 203).append("y", 102));
 
-        collection.insertOne(doc);
-
+            collection.insertOne(doc);
+            return true;
+        }
+        return false;
     }
-
     private MongoCollection<Document> openMongoDbCollection(String name) {
         MongoClient mongoClient = new MongoClient("localhost", 27017);
         MongoDatabase database = mongoClient.getDatabase("cortex_db");
-        MongoCollection<Document> collection = database.getCollection(name);
-        return collection;
+        return database.getCollection(name); //MongoCollection<Document> collection = database.getCollection(name);
     }
 }
