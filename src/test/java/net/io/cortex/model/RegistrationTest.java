@@ -19,7 +19,7 @@ class RegistrationTest {
         Registration regNull = new Registration();
 
         //Walidacja nie powinna do tego dopuścić!
-        assertTrue(regNull.register());
+        assertFalse(regNull.register());
     }
 
     @Test

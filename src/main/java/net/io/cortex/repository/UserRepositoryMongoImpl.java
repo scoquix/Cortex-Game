@@ -10,13 +10,14 @@ import org.bson.Document;
 import org.junit.platform.commons.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 
 public class UserRepositoryMongoImpl implements UserRepository {
+    private Authentication user;
+
     @Override
     public List<String> findAll() {
         MongoCollection<Document> collection = openMongoDbCollection("test");
@@ -36,13 +37,18 @@ public class UserRepositoryMongoImpl implements UserRepository {
 
     @Override
     public Optional<String> findById(String id) {
-        if (StringUtils.isBlank(id)) {
-            return Optional.empty();
-        }
-        MongoCollection<Document> collection = openMongoDbCollection("test");
-        Document myDoc = collection.find(eq("id", id)).first();
-
-        return Optional.ofNullable(myDoc.toJson());
+        // TODO: dodanie ID dla kazdego usera
+        //        if (StringUtils.isBlank(id)) {
+        //            return Optional.empty();
+        //        }
+        //        ObjectId x = new ObjectId(id);
+        //        MongoCollection<Document> collection = openMongoDbCollection("test");
+        //        Document myDoc = collection.find(eq("_id", x)).first();
+        //        if (!Optional.ofNullable(myDoc).isPresent()) {
+        //            return Optional.empty();
+        //        }
+        //        return Optional.ofNullable(myDoc.toJson());
+        return Optional.empty();
     }
 
     @Override
@@ -60,19 +66,25 @@ public class UserRepositoryMongoImpl implements UserRepository {
 
     @Override
     public boolean delete(Authentication user) {
+        boolean result = false;
+        this.user = user;
         if (user != null) {
             MongoCollection<Document> collection = openMongoDbCollection("test");
-            if (!findByName(user.getLogin()).isPresent())
-                return false;
+            if (findByName(user.getLogin()).isPresent()) {
+                collection.deleteOne(eq("name", user.getLogin()));
+                result = true;
+            }
 
-            //The following example deletes at most one document that meets the filter name equals user.getLogin()
-            collection.deleteOne(eq("name", user.getLogin()));
-            return true;
         }
-        return false;
+        return result;
     }
+
     @Override
     public boolean create(Registration user) {
+        if (user == null)
+            return false;
+        if (user.getLogin() == null || user.getPassword() == null)
+            return false;
         //instance running on localhost on port 27017
         //MongoClient mongoClient = new MongoClient();
         MongoClient mongoClient = new MongoClient("localhost", 27017);
@@ -87,33 +99,32 @@ public class UserRepositoryMongoImpl implements UserRepository {
 
         Document doc = new Document("name", user.getLogin())
                 .append("password", user.getPassword())
-                .append("type", (user.getLogin() != null && user.getLogin().equals("admin")) ? "admin" : "user");
+                .append("type", (user.getLogin().equals("admin")) ? "admin" : "user");
         Optional<String> userInBase = findByName(user.getLogin());
 
-        if (userInBase.isPresent()) {
-            System.out.println("User " + user.getLogin() + " jest juz w bazie");
+        if (userInBase.isPresent())
             return false;
-        } else {
-            collection.insertOne(doc);
-            mongoClient.close();
-            return true;
-        }
-
+        collection.insertOne(doc);
+        mongoClient.close();
+        return true;
     }
 
     @Override
-    public boolean update(Authentication user) {
-        if (user != null) {
-            MongoCollection<Document> collection = openMongoDbCollection("test");
-            Document doc = new Document("name", user.getLogin())
-                    .append("password", user.getPassword())
-                    .append("versions", Arrays.asList("v3.2", "v3.0", "v2.6"))
-                    .append("info", new Document("x", 203).append("y", 102));
+    public boolean update(Authentication oldUser, Authentication newUser) {
+        if (oldUser == null || newUser == null)
+            return false;
+        else if (newUser.getLogin() == null || newUser.getPassword() == null)
+            return false;
+        else if (findByName(oldUser.getLogin()).equals(Optional.empty()))
+            return false;
+        MongoCollection<Document> collection = openMongoDbCollection("test");
+        Document oldDoc = new Document("name", oldUser.getLogin())
+                .append("password", oldUser.getPassword());
 
-            collection.insertOne(doc);
-            return true;
-        }
-        return false;
+        Document newDoc = new Document("name", newUser.getLogin())
+                .append("password", newUser.getPassword());
+        collection.findOneAndReplace(oldDoc, newDoc);
+        return true;
     }
     private MongoCollection<Document> openMongoDbCollection(String name) {
         MongoClient mongoClient = new MongoClient("localhost", 27017);

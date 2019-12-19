@@ -1,16 +1,24 @@
 package net.io.cortex.model;
 
 public class Authentication {
+    private String id;
     private String login;
     private String password;
-
-    Authentication() {
-    }
 
     public Authentication(String login, String password) {
         this.login = login;
         this.password = password;
     }
+
+    Authentication() {
+    }
+
+    public Authentication(String id, String login, String password) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+    }
+
 
     public String getLogin() {
         return login;
@@ -30,6 +38,6 @@ public class Authentication {
 
     public boolean logging() {
 
-        return true;
+        return false;
     }
 }
