@@ -2,14 +2,15 @@ package net.io.cortex.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class AuthenticationTest {
 
     @Test
     void getLogin() {
-        Authentication authentication = new Authentication();
-        authentication.setLogin("login");
+        Authentication authentication = new Authentication("login", "password");
         assertEquals("login", authentication.getLogin());
     }
 
@@ -32,5 +33,22 @@ class AuthenticationTest {
         Authentication authentication = new Authentication();
         authentication.setPassword("pass");
         assertEquals("pass", authentication.getPassword());
+    }
+
+    @Test
+    void logging() {
+        String id = UUID.randomUUID().toString();
+        Authentication authentication = new Authentication("Ala" + id, "Kot");
+
+        assertFalse(authentication.logging());
+
+        authentication.setLogin("Ala");
+        authentication.setPassword("Kot");
+        assertTrue(authentication.logging());
+
+        Authentication regNull = new Authentication();
+
+        //Walidacja nie powinna do tego dopuścić!
+        assertFalse(regNull.logging());
     }
 }

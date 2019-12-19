@@ -17,5 +17,5 @@ public interface UserRepository {
 
     boolean create(Registration user);
 
-    boolean update(Authentication user);
+    boolean update(Authentication oldUser, Authentication newUser);
 }
