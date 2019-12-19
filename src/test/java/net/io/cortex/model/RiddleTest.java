@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class RiddleTest {
-    private Riddle emptyRiddle = new Riddle();
-    private Riddle riddle = new Riddle(1, new String[]{"A", "B", "C", "D"}, "Wybierz");
+    Riddle emptyRiddle = new Riddle();
+    Riddle riddle = new Riddle(1, new String[]{"A", "B", "C", "D"}, "Wybierz");
 
     @Test
     void getId() {

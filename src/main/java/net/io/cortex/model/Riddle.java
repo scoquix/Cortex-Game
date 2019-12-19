@@ -6,10 +6,10 @@ public class Riddle {
     private String[] answers;
     private String riddleContent;
 
-    Riddle() {
+    public Riddle() {
     }
 
-    Riddle(int id, String[] answers, String riddleContent) {
+    public Riddle(int id, String[] answers, String riddleContent) {
         this.id = id;
         this.answers = answers;
         this.riddleContent = riddleContent;
@@ -23,19 +23,19 @@ public class Riddle {
         this.id = id;
     }
 
-    String[] getAnswers() {
+    public String[] getAnswers() {
         return answers;
     }
 
-    void setAnswers(String[] answers) {
+    public void setAnswers(String[] answers) {
         this.answers = answers;
     }
 
-    String getRiddleContent() {
+    public String getRiddleContent() {
         return riddleContent;
     }
 
-    void setRiddleContent(String riddleContent) {
+    public void setRiddleContent(String riddleContent) {
         this.riddleContent = riddleContent;
     }
 
