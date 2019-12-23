@@ -1,31 +1,37 @@
 /*kolory w logo i odpowiedziach*/
-.top-buffer {
-    margin-top: 20px;
+.top-buffer
+{
+	margin-top: 20px;
 }
 
-.btn-primary {
-    color: #000000;
+.btn-primary
+{
+	color: #000000;
     background-color: #7cc;
     border-color: #5bc2c2
 }
 
-.btn-primary:hover {
-    color: #000000;
+.btn-primary:hover
+{
+	color: #000000;
 }
 
-.btn-primary:focus {
-    color: #000000;
+.btn-primary:focus
+{
+	color: #000000;
     background-color: #7cc;
     border-color: #5bc2c2
 }
 
-.btn-primary:active {
-    color: #000000;
+.btn-primary:active
+{
+	color: #000000;
     border-color: #5bc2c2
 }
 
-.custom {
-    width: 50%;
-    padding-left: 25px;
-    padding-right: 25px;
+.custom
+{
+	width: 50%;
+    padding-left:25px;
+    padding-right:25px;
 }
