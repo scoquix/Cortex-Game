@@ -41,9 +41,6 @@ window.onload = function () {
             }
             content.innerHTML = html;
             content.scrollTop = content.scrollHeight;
-            //redirect
-            window.location.href="user.html";
-            //$('#registerID').load('user');
         } else {
             console.log("There is a problem:", data);
         }
@@ -61,6 +58,9 @@ window.onload = function () {
             content.innerHTML = html;
             content.scrollTop = content.scrollHeight;
             //redirect
+            console.log("jesetem");
+            window.location.href = "user.html";
+
         } else {
             console.log("There is a problem:", data);
         }
@@ -68,19 +68,18 @@ window.onload = function () {
 
     registerButton.onclick = function () {
         console.log(name.value)
-        if (name.value == "") {
+        if (name.value === "") {
             alert("Please type your name!");
         } else {
             var text = message.value;
             console.log(name.value + ': ' + text);
-            //socket.emit('send', {name: text, message: name.value});
             socket.emit('register', {login: text, password: name.value});
         }
     };
 
     loginButton.onclick = function () {
         console.log(name.value)
-        if (name.value == "") {
+        if (name.value === "") {
             alert("Please type your name!");
         } else {
             var text = message.value;

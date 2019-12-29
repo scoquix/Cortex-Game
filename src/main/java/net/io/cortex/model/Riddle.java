@@ -2,24 +2,24 @@ package net.io.cortex.model;
 
 public class Riddle {
 
-    private int id;
+    private String id;
     private String[] answers;
-    private String riddleContent;
+    private byte[] riddleContent;
 
-    public Riddle() {
+    Riddle() {
     }
 
-    public Riddle(int id, String[] answers, String riddleContent) {
+    public Riddle(String id, String[] answers, byte[] riddleContent) {
         this.id = id;
         this.answers = answers;
         this.riddleContent = riddleContent;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -27,15 +27,15 @@ public class Riddle {
         return answers;
     }
 
-    public void setAnswers(String[] answers) {
+    void setAnswers(String[] answers) {
         this.answers = answers;
     }
 
-    public String getRiddleContent() {
+    public byte[] getRiddleContent() {
         return riddleContent;
     }
 
-    public void setRiddleContent(String riddleContent) {
+    public void setRiddleContent(byte[] riddleContent) {
         this.riddleContent = riddleContent;
     }
 

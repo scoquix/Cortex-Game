@@ -17,21 +17,19 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class UserRepositoryMongoImpl implements UserRepository {
     private Authentication user;
-
+    private MongoClient mongoClient;
     @Override
     public List<String> findAll() {
         MongoCollection<Document> collection = openMongoDbCollection("test");
         List<String> allUsers = new ArrayList<>();
-        MongoCursor<Document> cursor = collection.find().iterator();
-        try {
+        try (MongoCursor<Document> cursor = collection.find().iterator()) {
             while (cursor.hasNext()) {
                 String line = cursor.next().toJson();
                 System.out.println(line);
                 allUsers.add(line);
             }
-        } finally {
-            cursor.close();
         }
+        mongoClient.close();
         return allUsers;
     }
 
@@ -58,10 +56,13 @@ public class UserRepositoryMongoImpl implements UserRepository {
         }
         MongoCollection<Document> collection = openMongoDbCollection("test");
         Document myDoc = collection.find(eq("name", name)).first();
-        if (!Optional.ofNullable(myDoc).isPresent()) {
+        if (Optional.ofNullable(myDoc).isPresent()) {
+            mongoClient.close();
+            return Optional.ofNullable(myDoc.toJson());
+        } else {
             return Optional.empty();
         }
-        return Optional.ofNullable(myDoc.toJson());
+
     }
 
     @Override
@@ -74,7 +75,7 @@ public class UserRepositoryMongoImpl implements UserRepository {
                 collection.deleteOne(eq("name", user.getLogin()));
                 result = true;
             }
-
+            mongoClient.close();
         }
         return result;
     }
@@ -124,10 +125,11 @@ public class UserRepositoryMongoImpl implements UserRepository {
         Document newDoc = new Document("name", newUser.getLogin())
                 .append("password", newUser.getPassword());
         collection.findOneAndReplace(oldDoc, newDoc);
+        mongoClient.close();
         return true;
     }
     private MongoCollection<Document> openMongoDbCollection(String name) {
-        MongoClient mongoClient = new MongoClient("localhost", 27017);
+        mongoClient = new MongoClient("localhost", 27017);
         MongoDatabase database = mongoClient.getDatabase("cortex_db");
         return database.getCollection(name); //MongoCollection<Document> collection = database.getCollection(name);
     }
