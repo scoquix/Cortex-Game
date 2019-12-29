@@ -7,11 +7,10 @@ package net.io.cortex.controller;
 
 import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
+import net.io.cortex.RiddleOperations;
 import net.io.cortex.model.Authentication;
 import net.io.cortex.model.Message;
 import net.io.cortex.model.Registration;
-
-import java.util.Random;
 
 /**
  * @author Unknown
@@ -25,28 +24,13 @@ public class Controller {
     private static int b;
     private static String[] wrongAnswers;
 
-    private static void prepareAnswers() {
-        Random random = new Random();
-        a = random.nextInt(range);
-        b = random.nextInt(range);
-        rightAnswer = new String[]{String.valueOf(a + b)};
-        wrongAnswers = new String[]{String.valueOf(random.nextInt(range)), String.valueOf(random.nextInt(range)), String.valueOf(random.nextInt(range))};
-        System.out.println("Haloo");
-        for (int i = 0; i < wrongAnswers.length; ++i) {
-            System.out.println("Dla elementu: " + wrongAnswers[i]);
-            while (Integer.parseInt(wrongAnswers[i]) == a + b) {
-                wrongAnswers[i] = String.valueOf(random.nextInt(range));
-                System.out.println("Zmienilem wartosc na " + wrongAnswers[i]);
-            }
-        }
-    }
-
     public static void main(String[] args) {
         Configuration config = new Configuration();
         config.setHostname("localhost");
         config.setPort(3700);
-
-        prepareAnswers();
+        //-------------------------------------------
+        RiddleOperations.uploadImages();
+        //-------------------------------------------
         final SocketIOServer server = new SocketIOServer(config);
         server.addConnectListener(client -> {
             System.out.println("onConnected");
@@ -64,7 +48,7 @@ public class Controller {
                 server.getBroadcastOperations().sendEvent("message", serverMessage);
                 Message nextRoundMessage = new Message("GameBot", "Nastepna runda");
                 server.getBroadcastOperations().sendEvent("message", nextRoundMessage);
-                prepareAnswers();
+
                 server.getBroadcastOperations().sendEvent("message", new Message("GameBot", "Ile jest " + a + "+" + b + " ?"));
                 server.getBroadcastOperations().sendEvent("wrongAnswers", new Message("", wrongAnswers[0] + " " + wrongAnswers[1] + " " + wrongAnswers[2] + " " + rightAnswer[0]));
             }
@@ -74,9 +58,9 @@ public class Controller {
             System.out.println("Logging start");
             Authentication auth = new Authentication(authentication.getLogin(), authentication.getPassword());
             if (auth.logging()) {
-                socketIOClient.sendEvent("auth", "true");
+                socketIOClient.sendEvent("eventLogging", new Message("Server", "Authentication completed"));
             } else {
-                socketIOClient.sendEvent("auth", "false");
+                socketIOClient.sendEvent("eventLogging", new Message("Server", "Authentication failed"));
             }
         });
 
@@ -89,11 +73,20 @@ public class Controller {
                 socketIOClient.sendEvent("eventRegister", new Message("Server", "Something went wrong :( - Database do not create user"));
             }
         });
+        server.addEventListener("image", Message.class, (socketIOClient, message, ackRequest) -> {
+            System.out.println("Server odebral event image");
+            String riddle = RiddleOperations.downloadImageFromMongoDB();
+            int imageStartIndex = riddle.indexOf("/");
+            int imageEndIndex = riddle.indexOf("\"", imageStartIndex);
+            String base64EncodedImage = riddle.substring(imageStartIndex, imageEndIndex);
+
+            socketIOClient.sendEvent("eventImage", new Message("Server", base64EncodedImage));
+        });
+
+
         System.out.println("Starting server...");
         server.start();
         System.out.println("Server started");
-        Registration registration = new Registration("ala2", "kot");
-        registration.register();
     }
 
 }

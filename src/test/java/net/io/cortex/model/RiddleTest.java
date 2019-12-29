@@ -6,19 +6,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class RiddleTest {
-    Riddle emptyRiddle = new Riddle();
-    Riddle riddle = new Riddle(1, new String[]{"A", "B", "C", "D"}, "Wybierz");
+    private Riddle emptyRiddle = new Riddle();
+    private byte[] image = null;
+    private Riddle riddle = new Riddle("1", new String[]{"A", "B", "C", "D"}, image);
 
     @Test
     void getId() {
-        assertEquals(1, riddle.getId(), "Id not equals");
-        assertEquals(0, emptyRiddle.getId(), "getId empty test - failed");
+        assertEquals("1", riddle.getId(), "Id not equals");
+        assertNull(emptyRiddle.getId(), "getId empty test - failed");
     }
 
     @Test
     void setId() {
-        riddle.setId(2);
-        assertEquals(2, riddle.getId(), "setId test - failed");
+        riddle.setId("2");
+        assertEquals("2", riddle.getId(), "setId test - failed");
     }
 
     @Test
@@ -37,14 +38,11 @@ class RiddleTest {
 
     @Test
     void getRiddleContent() {
-        assertEquals("Wybierz", riddle.getRiddleContent(), "getRiddleContent test - failed");
-        assertNull(emptyRiddle.getRiddleContent());
+        //TODO: test do napisania
     }
 
     @Test
     void setRiddleContent() {
-        riddle.setRiddleContent("Select");
-        assertEquals("Select", riddle.getRiddleContent(), "setRiddleContent test - failed");
-
+        //TODO: test do napisania
     }
 }
