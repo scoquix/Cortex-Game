@@ -35,7 +35,7 @@ public class Riddle {
         return riddleContent;
     }
 
-    public void setRiddleContent(byte[] riddleContent) {
+    void setRiddleContent(byte[] riddleContent) {
         this.riddleContent = riddleContent;
     }
 

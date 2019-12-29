@@ -54,6 +54,10 @@ public class Controller {
             }
 
         });
+
+        //------------------------------------------------
+        // eventy rejestracja i logowanie
+        //------------------------------------------------
         server.addEventListener("logging", Authentication.class, (socketIOClient, authentication, ackRequest) -> {
             System.out.println("Logging start");
             Authentication auth = new Authentication(authentication.getLogin(), authentication.getPassword());
@@ -63,7 +67,6 @@ public class Controller {
                 socketIOClient.sendEvent("eventLogging", new Message("Server", "Authentication failed"));
             }
         });
-
         server.addEventListener("register", Registration.class, (socketIOClient, message, ackRequest) -> {
             System.out.println("Server odebral event register");
             Registration reg = new Registration(message.getLogin(), message.getPassword());
@@ -73,6 +76,9 @@ public class Controller {
                 socketIOClient.sendEvent("eventRegister", new Message("Server", "Something went wrong :( - Database do not create user"));
             }
         });
+        //------------------------------------------------
+        // eventy do pobrania zagedek
+        //------------------------------------------------
         server.addEventListener("image", Message.class, (socketIOClient, message, ackRequest) -> {
             System.out.println("Server odebral event image");
             String riddle = RiddleOperations.downloadImageFromMongoDB();
@@ -83,6 +89,14 @@ public class Controller {
             socketIOClient.sendEvent("eventImage", new Message("Server", base64EncodedImage));
         });
 
+        server.addEventListener("answer", Message.class, (socketIOClient, message, ackRequest) -> {
+            System.out.println(message.getName() + " przesyla odp: " + message.getMessage());
+            System.out.println("All rooms: " + socketIOClient.getAllRooms());
+            System.out.println("getHandshakeData: " + socketIOClient.getHandshakeData());
+            System.out.println("getRemoteAddress: " + socketIOClient.getRemoteAddress());
+            System.out.println("getSessionId: " + socketIOClient.getSessionId());
+        });
+        //------------------------------------------------
 
         System.out.println("Starting server...");
         server.start();

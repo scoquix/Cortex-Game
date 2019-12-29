@@ -13,7 +13,7 @@ import java.util.*;
 import static com.mongodb.client.model.Filters.eq;
 
 public class RiddleRepositoryMongoImpl implements RiddleRepository {
-
+    private MongoClient mongoClient;
     @Override
     public Optional<String> findByName(String name) {
         if (StringUtils.isBlank(name)) {
@@ -63,28 +63,48 @@ public class RiddleRepositoryMongoImpl implements RiddleRepository {
 
     @Override
     public boolean update(Riddle oldRiddle, Riddle newRiddle) {
-        // TODO: Update riddle content
-        return false;
+        if (oldRiddle == null || newRiddle == null) {
+            mongoClient.close();
+            return false;
+        } else if (newRiddle.getAnswers() == null || newRiddle.getRiddleContent() == null) {
+            mongoClient.close();
+            return false;
+        } else if (findByName(oldRiddle.getId()).equals(Optional.empty())) {
+            mongoClient.close();
+            return false;
+        }
+        MongoCollection<Document> collection = openMongoDbCollection("riddles");
+        String encode = Base64.getEncoder().encodeToString(oldRiddle.getRiddleContent());
+        Document oldDoc = new Document("name", oldRiddle.getId())
+                .append("content", encode)
+                .append("answers", Arrays.toString(oldRiddle.getAnswers()));
+
+        String encodeNew = Base64.getEncoder().encodeToString(newRiddle.getRiddleContent());
+        Document newDoc = new Document("name", newRiddle.getId())
+                .append("content", encodeNew)
+                .append("answers", Arrays.toString(newRiddle.getAnswers()));
+
+        collection.findOneAndReplace(oldDoc, newDoc);
+
+        mongoClient.close();
+        return true;
     }
 
     @Override
     public boolean delete(Riddle riddle) {
         boolean result = false;
-        //this.user = user;
         if (riddle != null) {
             MongoCollection<Document> collection = openMongoDbCollection("riddles");
             if (findByName(riddle.getId()).isPresent()) {
                 collection.deleteOne(eq("name", riddle.getId()));
                 result = true;
             }
-
         }
         return result;
     }
 
-
     @Override
-    public List<String> findAll(String name) {
+    public List<String> findAll() {
         MongoCollection<Document> collection = openMongoDbCollection("riddles");
         List<String> allRiddles = new ArrayList<>();
         try (MongoCursor<Document> cursor = collection.find().iterator()) {
@@ -98,7 +118,7 @@ public class RiddleRepositoryMongoImpl implements RiddleRepository {
     }
 
     private MongoCollection<Document> openMongoDbCollection(String name) {
-        MongoClient mongoClient = new MongoClient("localhost", 27017);
+        mongoClient = new MongoClient("localhost", 27017);
         MongoDatabase database = mongoClient.getDatabase("cortex_db");
         return database.getCollection(name); //MongoCollection<Document> collection = database.getCollection(name);
     }

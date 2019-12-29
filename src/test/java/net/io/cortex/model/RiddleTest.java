@@ -38,11 +38,22 @@ class RiddleTest {
 
     @Test
     void getRiddleContent() {
-        //TODO: test do napisania
+        assertNull(emptyRiddle.getRiddleContent());
+        assertNull(riddle.getRiddleContent());
+        byte[] arr = {123, 123, 123};
+        riddle.setRiddleContent(arr);
+
+        assertEquals(arr, riddle.getRiddleContent(), "getRiddleContent -- failed");
     }
 
     @Test
     void setRiddleContent() {
-        //TODO: test do napisania
+        riddle.setRiddleContent(null);
+        assertNull(riddle.getRiddleContent());
+
+        byte[] arr = {123, 123, 123};
+        riddle.setRiddleContent(arr);
+
+        assertEquals(arr, riddle.getRiddleContent(), "getRiddleContent -- failed");
     }
 }
