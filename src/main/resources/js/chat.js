@@ -58,6 +58,7 @@ window.onload = function () {
             content.innerHTML = html;
             content.scrollTop = content.scrollHeight;
             //redirect
+            console.log("jesetem");
             window.location.href = "user.html";
 
         } else {

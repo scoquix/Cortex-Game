@@ -22,15 +22,12 @@ public class UserRepositoryMongoImpl implements UserRepository {
     public List<String> findAll() {
         MongoCollection<Document> collection = openMongoDbCollection("test");
         List<String> allUsers = new ArrayList<>();
-        MongoCursor<Document> cursor = collection.find().iterator();
-        try {
+        try (MongoCursor<Document> cursor = collection.find().iterator()) {
             while (cursor.hasNext()) {
                 String line = cursor.next().toJson();
                 System.out.println(line);
                 allUsers.add(line);
             }
-        } finally {
-            cursor.close();
         }
         mongoClient.close();
         return allUsers;
@@ -59,12 +56,13 @@ public class UserRepositoryMongoImpl implements UserRepository {
         }
         MongoCollection<Document> collection = openMongoDbCollection("test");
         Document myDoc = collection.find(eq("name", name)).first();
-        if (Optional.ofNullable(myDoc).isEmpty()) {
+        if (Optional.ofNullable(myDoc).isPresent()) {
+            mongoClient.close();
+            return Optional.ofNullable(myDoc.toJson());
+        } else {
             return Optional.empty();
         }
 
-        mongoClient.close();
-        return Optional.ofNullable(myDoc.toJson());
     }
 
     @Override

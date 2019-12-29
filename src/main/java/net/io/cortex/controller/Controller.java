@@ -11,7 +11,6 @@ import net.io.cortex.RiddleOperations;
 import net.io.cortex.model.Authentication;
 import net.io.cortex.model.Message;
 import net.io.cortex.model.Registration;
-import net.io.cortex.model.Riddle;
 
 /**
  * @author Unknown
@@ -59,9 +58,9 @@ public class Controller {
             System.out.println("Logging start");
             Authentication auth = new Authentication(authentication.getLogin(), authentication.getPassword());
             if (auth.logging()) {
-                socketIOClient.sendEvent("auth", "true");
+                socketIOClient.sendEvent("eventLogging", new Message("Server", "Authentication completed"));
             } else {
-                socketIOClient.sendEvent("auth", "false");
+                socketIOClient.sendEvent("eventLogging", new Message("Server", "Authentication failed"));
             }
         });
 
@@ -74,7 +73,7 @@ public class Controller {
                 socketIOClient.sendEvent("eventRegister", new Message("Server", "Something went wrong :( - Database do not create user"));
             }
         });
-        server.addEventListener("image", Riddle.class, (socketIOClient, message, ackRequest) -> {
+        server.addEventListener("image", Message.class, (socketIOClient, message, ackRequest) -> {
             System.out.println("Server odebral event image");
             String riddle = RiddleOperations.downloadImageFromMongoDB();
             int imageStartIndex = riddle.indexOf("/");

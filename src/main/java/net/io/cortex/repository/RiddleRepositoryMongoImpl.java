@@ -23,11 +23,11 @@ public class RiddleRepositoryMongoImpl implements RiddleRepository {
         MongoCollection<Document> collection = openMongoDbCollection("riddles");
         Document myDoc = collection.find(eq("name", name)).first();
 
-        if (Optional.ofNullable(myDoc).isEmpty()) {
-            return Optional.empty();
+        if (Optional.ofNullable(myDoc).isPresent()) {
+            return Optional.ofNullable(myDoc.toJson());
         }
+        return Optional.empty();
 
-        return Optional.ofNullable(myDoc.toJson());
     }
 
     @Override

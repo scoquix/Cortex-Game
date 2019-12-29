@@ -4,7 +4,6 @@ window.onload = function () {
     var message = document.getElementById("message");
     var registerButton = document.getElementById("registerID");
     var loginButton = document.getElementById("loginID");
-    var imageButton = document.getElementById("imageRequest");
     var content = document.getElementById("content");
     var name = document.getElementById("name");
 
@@ -59,7 +58,8 @@ window.onload = function () {
             content.innerHTML = html;
             content.scrollTop = content.scrollHeight;
             //redirect
-            window.location.href="user.html";
+            console.log("jesetem");
+            window.location.href = "user.html";
 
         } else {
             console.log("There is a problem:", data);
@@ -68,7 +68,7 @@ window.onload = function () {
 
     registerButton.onclick = function () {
         console.log(name.value)
-        if (name.value == "") {
+        if (name.value === "") {
             alert("Please type your name!");
         } else {
             var text = message.value;
@@ -79,7 +79,7 @@ window.onload = function () {
 
     loginButton.onclick = function () {
         console.log(name.value)
-        if (name.value == "") {
+        if (name.value === "") {
             alert("Please type your name!");
         } else {
             var text = message.value;
