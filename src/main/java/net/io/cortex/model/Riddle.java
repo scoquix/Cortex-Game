@@ -1,19 +1,35 @@
 package net.io.cortex.model;
 
+import java.util.ArrayList;
+import java.util.Base64;
+
 public class Riddle {
 
     private String id;
-    private String[] answers;
-    private byte[] riddleContent;
+    private String answers;
+    private String riddleContent;
 
-    Riddle() {
-    }
-
-    public Riddle(String id, String[] answers, byte[] riddleContent) {
+    public Riddle(String id, ArrayList<byte[]> answers, byte[] riddleContent) {
         this.id = id;
-        this.answers = answers;
-        this.riddleContent = riddleContent;
+        this.answers = encryptAnswers(answers);
+        this.riddleContent = encryptContent(riddleContent);
     }
+
+    private String encryptAnswers(ArrayList<byte[]> answers) {
+        StringBuilder answersBuilder = new StringBuilder();
+        for (byte[] answer : answers) {
+            String encodeAnswer = Base64.getEncoder().encodeToString(answer);
+            answersBuilder.append(encodeAnswer);
+            answersBuilder.append("|");
+        }
+        answersBuilder.deleteCharAt(answersBuilder.length() - 1);
+        return answersBuilder.toString();
+    }
+
+    private String encryptContent(byte[] content) {
+        return Base64.getEncoder().encodeToString(content);
+    }
+
 
     public String getId() {
         return id;
@@ -23,19 +39,19 @@ public class Riddle {
         this.id = id;
     }
 
-    public String[] getAnswers() {
+    public String getAnswers() {
         return answers;
     }
 
-    void setAnswers(String[] answers) {
+    void setAnswers(String answers) {
         this.answers = answers;
     }
 
-    public byte[] getRiddleContent() {
+    public String getRiddleContent() {
         return riddleContent;
     }
 
-    void setRiddleContent(byte[] riddleContent) {
+    void setRiddleContent(String riddleContent) {
         this.riddleContent = riddleContent;
     }
 

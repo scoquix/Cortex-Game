@@ -8,7 +8,9 @@ import net.io.cortex.model.Riddle;
 import org.bson.Document;
 import org.junit.platform.commons.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -47,10 +49,10 @@ public class RiddleRepositoryMongoImpl implements RiddleRepository {
         //Specify the name of the collection to the getCollection() method.
         //If a collection does not exist, MongoDB creates the collection when you first store data for that collection.
         MongoCollection<Document> collection = database.getCollection("riddles");
-        String encode = Base64.getEncoder().encodeToString(riddle.getRiddleContent());
+
         Document doc = new Document("name", riddle.getId())
-                .append("content", encode)
-                .append("answers", Arrays.toString(riddle.getAnswers()));
+                .append("content", riddle.getRiddleContent())
+                .append("answers", riddle.getAnswers());
         Optional<String> riddleInBase = findByName(riddle.getId());
 
         if (riddleInBase.isPresent())
@@ -74,15 +76,13 @@ public class RiddleRepositoryMongoImpl implements RiddleRepository {
             return false;
         }
         MongoCollection<Document> collection = openMongoDbCollection("riddles");
-        String encode = Base64.getEncoder().encodeToString(oldRiddle.getRiddleContent());
         Document oldDoc = new Document("name", oldRiddle.getId())
-                .append("content", encode)
-                .append("answers", Arrays.toString(oldRiddle.getAnswers()));
+                .append("content", oldRiddle.getRiddleContent())
+                .append("answers", oldRiddle.getAnswers());
 
-        String encodeNew = Base64.getEncoder().encodeToString(newRiddle.getRiddleContent());
         Document newDoc = new Document("name", newRiddle.getId())
-                .append("content", encodeNew)
-                .append("answers", Arrays.toString(newRiddle.getAnswers()));
+                .append("content", newRiddle.getRiddleContent())
+                .append("answers", newRiddle.getAnswers());
 
         collection.findOneAndReplace(oldDoc, newDoc);
 
