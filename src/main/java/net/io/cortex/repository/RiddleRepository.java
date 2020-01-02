@@ -14,5 +14,5 @@ public interface RiddleRepository {
 
     Optional<String> findByName(String name);
 
-    List<String> findAll(String name);
+    List<String> findAll();
 }

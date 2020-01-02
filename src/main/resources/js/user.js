@@ -1,8 +1,8 @@
 window.onload = function () {
-    var messages = [];
+    var answers = [];
     var imageButton = document.getElementById("imageButton");
-    var message = document.getElementById("message");
-
+    var content = document.getElementById("content");
+    var answersBlock = document.getElementById("answers");
     var socket = io.connect('http://localhost:3700', {
         'reconnection delay': 2000,
         'force new connection': true
@@ -13,18 +13,19 @@ window.onload = function () {
     });
 
     //------------------------------------------------
-    // Funkcja przygotowana do zaladowania obrazku z bazy danych
+    // Funkcja przygotowana do odebrania obrazku z bazy danych
     // Docelowo bedzie to element gameview
     //------------------------------------------------
     socket.on('eventImage', function (data) {
         console.log(data);
         if (data.message) {
-            messages.push(data);
+            //messages.push(data);
             var encodedImage = '';
-            for (var i = 0; i < messages.length; i++)
-                encodedImage += messages[i].message;
+            //for (var i = 0; i < messages.length; i++)
+            encodedImage += data.message;
 
             var html = "<img src=\"data:image/png;base64," + encodedImage + "\" alt=\"Riddle Image\"/>";
+            content.innerHTML = "";
             content.innerHTML = html;
             content.scrollTop = content.scrollHeight;
         } else {
@@ -32,6 +33,42 @@ window.onload = function () {
         }
     });
     //-----------------------------------------------
+    // Funkcja przygotowana do pobrania odpowiedzi w formie obrazkow
+    // Docelowo bedzie to element gameview
+    //-----------------------------------------------
+    socket.on('eventAnswers', function (data) {
+        if (!data.message) {
+            return;
+        }
+        var imagesAsBitmaps = data.message.split("|");
+
+        for (var i = 0; i < imagesAsBitmaps.length; i++) {
+            var image = "<img src=\"data:image/png;base64," + imagesAsBitmaps[i] + "\" alt=\"Answer\"/>";
+            var button = "<button class='answers' id='" + i + "'>" + image + "</button>";
+            answers += button;
+        }
+        answersBlock.innerHTML = "";
+        answersBlock.innerHTML = answers;
+        var buttons = document.getElementsByClassName("answers");
+        for (var j = 0; j < buttons.length; j++) {
+            buttons[j].addEventListener("click", function () {
+                socket.emit("answer", {name: "", message: imagesAsBitmaps[this.id]});
+            });
+        }
+
+    });
+    //-----------------------------------------------
+    // Funkcja przygotowana do wyswietlenia blednej odpowiedzi
+    // Docelowo bedzie to element gameview
+    //-----------------------------------------------
+    socket.on("eventWrongAnswer", function (data) {
+        alert("Muahahahahah you are wrong!!!!");
+    })
+    socket.on("eventCorrectAnswer", function (data) {
+        alert("Correct! You are awesome, my friend!")
+    })
+    //-----------------------------------------------
+
     imageButton.onclick = function () {
         // TODO: autentykacja usera, tak aby nie mial dostepu do panelu usera bez zalogowania
 
@@ -42,7 +79,7 @@ window.onload = function () {
         //     var text = message.value;
         //     console.log(name.value + ': ' + text);
         // }
-        socket.emit('image', {name: "", message: ""});
+        socket.emit('riddle', {name: "", message: ""});
     };
+};
 
-}

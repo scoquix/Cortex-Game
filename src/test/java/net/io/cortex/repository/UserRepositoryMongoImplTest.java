@@ -34,16 +34,18 @@ class UserRepositoryMongoImplTest {
     void findById() {
         UserRepositoryMongoImpl userRepositoryMongo = new UserRepositoryMongoImpl();
         Optional<String> user = userRepositoryMongo.findByName("Ala");
-        String mappedObject = null;
+        String mappedObject;
         Authentication authUser = null;
         String idString = null;
         try {
             ObjectMapper mapper = new ObjectMapper();
-            mappedObject = mapper.writeValueAsString(user.get());
-            int startIndex = mappedObject.indexOf("\\\"$oid\\\" : ") + 11;
-            int endIndex = mappedObject.indexOf("}", startIndex);
-            idString = mappedObject.substring(startIndex, endIndex);
-            idString = idString.replaceAll("\\\\\"", "").trim();
+            if (user.isPresent()) {
+                mappedObject = mapper.writeValueAsString(user.get());
+                int startIndex = mappedObject.indexOf("\\\"$oid\\\" : ") + 11;
+                int endIndex = mappedObject.indexOf("}", startIndex);
+                idString = mappedObject.substring(startIndex, endIndex);
+                idString = idString.replaceAll("\\\\\"", "").trim();
+            }
         } catch (JsonProcessingException ex) {
             ex.printStackTrace();
         }
@@ -59,6 +61,7 @@ class UserRepositoryMongoImplTest {
 
     @Test
     void findByName() {
+
         UserRepositoryMongoImpl userRepositoryMongo = new UserRepositoryMongoImpl();
         assertEquals(Optional.empty(), userRepositoryMongo.findByName(null), "Null string test failed");
         Optional<String> jsonName = userRepositoryMongo.findByName("Ala");
