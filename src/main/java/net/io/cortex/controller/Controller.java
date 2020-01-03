@@ -9,6 +9,7 @@ import com.corundumstudio.socketio.Configuration;
 import com.corundumstudio.socketio.SocketIOServer;
 import net.io.cortex.RiddleOperations;
 import net.io.cortex.model.Authentication;
+import net.io.cortex.model.Lobby;
 import net.io.cortex.model.Message;
 import net.io.cortex.model.Registration;
 
@@ -20,8 +21,10 @@ import java.util.regex.Pattern;
  */
 public class Controller {
     private static int range = 10;
-    private static ArrayList<UUID> sessionsID = new ArrayList<>();
-    private static ArrayList<String> correctAnswers = new ArrayList<>();
+    private static Map<UUID, String> usersSessionsID = new HashMap<>();
+    private static List<UUID> gameSessionID = new ArrayList<UUID>();
+    private static List<String> correctAnswers = new ArrayList<>();
+    private static List<Lobby> lobbies = new ArrayList<>();
     private static int a;
     private static int b;
 
@@ -62,6 +65,8 @@ public class Controller {
             System.out.println("Logging start");
             Authentication auth = new Authentication(authentication.getLogin(), authentication.getPassword());
             if (auth.logging()) {
+                // TODO: Funkcja ktora sprawdza co 5 min czy user aktywny i czysc usersSessionID
+                usersSessionsID.put(socketIOClient.getSessionId(), auth.getLogin());
                 socketIOClient.sendEvent("eventLogging", new Message("Server", "Authentication completed"));
             } else {
                 socketIOClient.sendEvent("eventLogging", new Message("Server", "Authentication failed"));
@@ -77,11 +82,15 @@ public class Controller {
             }
         });
         //------------------------------------------------
-        // eventy do pobrania zagadek
+
+        //------------------------------------------------
+        // event do pobrania zagadki
         //------------------------------------------------
         server.addEventListener("riddle", Message.class, (socketIOClient, message, ackRequest) -> {
             System.out.println("Server odebral event riddle");
-            sessionsID.add(socketIOClient.getSessionId());
+            if (gameSessionID.indexOf(socketIOClient.getSessionId()) == -1) {
+                gameSessionID.add(socketIOClient.getSessionId());
+            }
             String riddle = RiddleOperations.downloadImageFromMongoDB();
             System.out.println(riddle);
 
@@ -103,7 +112,11 @@ public class Controller {
             server.getBroadcastOperations().sendEvent("eventImage", new Message("Server", base64EncodedImage));
             server.getBroadcastOperations().sendEvent("eventAnswers", new Message("Server", encodedAnswers));
         });
+        //------------------------------------------------
 
+        //------------------------------------------------
+        // event do sprawdzenia poprawnej odpowiedzi
+        //------------------------------------------------
         server.addEventListener("answer", Message.class, (socketIOClient, message, ackRequest) -> {
             System.out.println("Server odebral event answers");
             System.out.println(message.getName() + " przesyla odp: " + message.getMessage());
@@ -112,7 +125,9 @@ public class Controller {
             System.out.println("getRemoteAddress: " + socketIOClient.getRemoteAddress());
             System.out.println("getSessionId: " + socketIOClient.getSessionId());
 
-            int index = sessionsID.indexOf(socketIOClient.getSessionId());
+
+            int index = gameSessionID.indexOf(socketIOClient.getSessionId());
+
             if (index != -1) {
                 if (message.getMessage().equals(correctAnswers.get(index))) {
 
@@ -125,6 +140,22 @@ public class Controller {
         });
         //------------------------------------------------
 
+        //------------------------------------------------
+        // event do pokazania aktywnych pokoi
+        //------------------------------------------------
+        server.addEventListener("showLobbies", Message.class, (socketIOClient, message, ackRequest) -> {
+            System.out.println("Server odebral event answers");
+            System.out.println(message.getName() + " przesyla odp: " + message.getMessage());
+            System.out.println("All rooms: " + socketIOClient.getAllRooms());
+            System.out.println("getHandshakeData: " + socketIOClient.getHandshakeData());
+            System.out.println("getRemoteAddress: " + socketIOClient.getRemoteAddress());
+            System.out.println("getSessionId: " + socketIOClient.getSessionId());
+
+            socketIOClient.sendEvent("eventShowLobbies", new Message("Server", socketIOClient.getAllRooms().toString()));
+        });
+
+
+        //------------------------------------------------
         System.out.println("Starting server...");
         server.start();
         System.out.println("Server started");

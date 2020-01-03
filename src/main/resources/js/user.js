@@ -1,6 +1,7 @@
 window.onload = function () {
     var answers = [];
     var imageButton = document.getElementById("imageButton");
+    var showLobbiesButton = document.getElementById("showLobbies");
     var content = document.getElementById("content");
     var answersBlock = document.getElementById("answers");
     var socket = io.connect('http://localhost:3700', {
@@ -58,15 +59,34 @@ window.onload = function () {
 
     });
     //-----------------------------------------------
-    // Funkcja przygotowana do wyswietlenia blednej odpowiedzi
+    // Funkcje przygotowane do wyswietlenia blednej i poprawnej odpowiedzi
     // Docelowo bedzie to element gameview
     //-----------------------------------------------
     socket.on("eventWrongAnswer", function (data) {
         alert("Muahahahahah you are wrong!!!!");
-    })
+    });
     socket.on("eventCorrectAnswer", function (data) {
         alert("Correct! You are awesome, my friend!")
-    })
+    });
+    //-----------------------------------------------
+
+    //-----------------------------------------------
+    // Funkcja przygotowane do wyswietlenia lobbies
+    // TODO: Team ustali gdzie ma sie ona znajdowac
+    //-----------------------------------------------
+    showLobbiesButton.onclick = function () {
+        socket.emit("showLobbies", {name: "", message: socket.sessionId})
+
+    };
+    //-----------------------------------------------
+
+    //-----------------------------------------------
+    // Funkcja przygotowane do wyswietlenia lobbies
+    //-----------------------------------------------
+    socket.on("eventShowLobbies", function (data) {
+        if (data.message)
+            console.log(data.message);
+    });
     //-----------------------------------------------
 
     imageButton.onclick = function () {
