@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Random;
 
 public class RiddleOperations {
     private static byte[] createInputStream(String filePath) throws Exception {
@@ -41,7 +42,9 @@ public class RiddleOperations {
         MongoClient mongoClient = new MongoClient("localhost", 27017);
         //Riddle riddle = new Riddle(listOfFiles[i].getName(),answers,imageBytes);
         RiddleRepositoryMongoImpl riddleRepositoryMongo = new RiddleRepositoryMongoImpl();
-        Optional<String> image = riddleRepositoryMongo.findByName("10");
+        Random rand = new Random();
+        int randInt = rand.nextInt(5) + 1;
+        Optional<String> image = riddleRepositoryMongo.findByName(Integer.toString(randInt));
         mongoClient.close();
         return image.orElse(null);
     }
@@ -50,7 +53,9 @@ public class RiddleOperations {
         MongoClient mongoClient = new MongoClient("localhost", 27017);
         //Riddle riddle = new Riddle(listOfFiles[i].getName(),answers,imageBytes);
         RiddleRepositoryMongoImpl riddleRepositoryMongo = new RiddleRepositoryMongoImpl();
-        Optional<String> image = riddleRepositoryMongo.findByName("10");
+        Random rand = new Random();
+        int randInt = rand.nextInt(5) + 1;
+        Optional<String> image = riddleRepositoryMongo.findByName(Integer.toString(randInt));
         mongoClient.close();
         return image.orElse(null);
     }

@@ -42,13 +42,14 @@ window.onload = function () {
             return;
         }
         var imagesAsBitmaps = data.message.split("|");
-
+        answers = [];
         for (var i = 0; i < imagesAsBitmaps.length; i++) {
             var image = "<img src=\"data:image/png;base64," + imagesAsBitmaps[i] + "\" alt=\"Answer\"/>";
             var button = "<button class='answers' id='" + i + "'>" + image + "</button>";
             answers += button;
         }
         answersBlock.innerHTML = "";
+        answersBlock.innerText = "";
         answersBlock.innerHTML = answers;
         var buttons = document.getElementsByClassName("answers");
         for (var j = 0; j < buttons.length; j++) {
