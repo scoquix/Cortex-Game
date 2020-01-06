@@ -22,9 +22,10 @@ import java.util.regex.Pattern;
 public class Controller {
     private static int range = 10;
     private static Map<UUID, String> usersSessionsID = new HashMap<>();
-    private static List<UUID> gameSessionID = new ArrayList<UUID>();
+    private static List<UUID> gameSessionID = new ArrayList<>();
     private static List<String> correctAnswers = new ArrayList<>();
     private static List<Lobby> lobbies = new ArrayList<>();
+
     private static int a;
     private static int b;
 
@@ -133,6 +134,7 @@ public class Controller {
 
                     Message serverMessage = new Message("GameBot", "Jako pierwszy poprawnej odpowiedzi udzielił gracz " + message.getName());
                     server.getBroadcastOperations().sendEvent("eventCorrectAnswer", serverMessage);
+
                 } else {
                     socketIOClient.sendEvent("eventWrongAnswer", new Message(message.getName(), "Wrong Answer"));
                 }
@@ -144,16 +146,55 @@ public class Controller {
         // event do pokazania aktywnych pokoi
         //------------------------------------------------
         server.addEventListener("showLobbies", Message.class, (socketIOClient, message, ackRequest) -> {
-            System.out.println("Server odebral event answers");
+            System.out.println("Server odebral event showLobbies");
             System.out.println(message.getName() + " przesyla odp: " + message.getMessage());
             System.out.println("All rooms: " + socketIOClient.getAllRooms());
             System.out.println("getHandshakeData: " + socketIOClient.getHandshakeData());
             System.out.println("getRemoteAddress: " + socketIOClient.getRemoteAddress());
             System.out.println("getSessionId: " + socketIOClient.getSessionId());
 
-            socketIOClient.sendEvent("eventShowLobbies", new Message("Server", socketIOClient.getAllRooms().toString()));
+            StringBuilder lobbiesNames = new StringBuilder();
+            lobbies.forEach(lobby -> {
+                lobbiesNames.append(lobby.getOwner());
+                lobbiesNames.append(",");
+            });
+
+            if (lobbiesNames.length() > 1)
+                lobbiesNames.deleteCharAt(lobbiesNames.length() - 1);
+
+            socketIOClient.sendEvent("eventShowLobbies", new Message("Server", lobbiesNames.toString()));
         });
 
+        //------------------------------------------------
+        // event do utworzenia pokoju
+        //------------------------------------------------
+        server.addEventListener("createLobby", Message.class, (socketIOClient, message, ackRequest) -> {
+            System.out.println("Server odebral event create lobby");
+            System.out.println(message.getName() + " przesyla odp: " + message.getMessage());
+            System.out.println("All rooms: " + socketIOClient.getAllRooms());
+            System.out.println("getSessionId: " + socketIOClient.getSessionId());
+
+            Lobby lobby = new Lobby(socketIOClient.getSessionId().toString());
+            lobby.addUser(socketIOClient.getSessionId());
+
+            boolean hasLobby = false;
+            for (Lobby l : lobbies) {
+                if (l.getOwner().equals(lobby.getOwner())) {
+                    hasLobby = true;
+                    break;
+                }
+            }
+
+            if (hasLobby) {
+                System.out.println("Nie stworzono lobby");
+                socketIOClient.sendEvent("eventCreateLobby", new Message("Server", "You've already joined or created a lobby"));
+            } else {
+                lobbies.add(lobby);
+                System.out.println("Stworzono lobby o nazwie: " + lobby.getOwner());
+                socketIOClient.sendEvent("eventCreateLobby", new Message("Server", "Created lobby with name: " + lobby.getOwner()));
+            }
+
+        });
 
         //------------------------------------------------
         System.out.println("Starting server...");
