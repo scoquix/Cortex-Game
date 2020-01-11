@@ -7,9 +7,14 @@ window.onload = function () {
         'reconnection delay': 2000,
         'force new connection': true
     });
-
+    const cookies = document.cookie.split(/; */); //dopasuje "; " ale też ";"
+    const sessID = cookies[1].split("=")[1];
+    const lobbyID = cookies[0].split("=")[1];
     socket.on('connect', function () {
-        console.log('connected');
+        console.log("Client connected");
+        console.log("sessID: " + sessID);
+        console.log("lobby: " + lobbyID);
+        socket.emit('socketGameInit', {name: sessID, message: lobbyID});
     });
 
     imageButton.onclick = function () {
@@ -22,7 +27,9 @@ window.onload = function () {
         //     var text = message.value;
         //     console.log(name.value + ': ' + text);
         // }
-        socket.emit('riddle', {name: "", message: ""});
+
+        //name => room ID
+        socket.emit('riddle', {name: sessID, message: lobbyID});
     };
 
     //------------------------------------------------
@@ -66,10 +73,9 @@ window.onload = function () {
         var buttons = document.getElementsByClassName("answers");
         for (var j = 0; j < buttons.length; j++) {
             buttons[j].addEventListener("click", function () {
-                socket.emit("answer", {name: "", message: imagesAsBitmaps[this.id]});
+                socket.emit("answer", {name: lobbyID, message: imagesAsBitmaps[this.id]});
             });
         }
-
     });
     //-----------------------------------------------
     // Funkcje przygotowane do wyswietlenia blednej i poprawnej odpowiedzi
