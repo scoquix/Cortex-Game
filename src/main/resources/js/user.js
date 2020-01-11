@@ -4,11 +4,14 @@ window.onload = function () {
     var content = document.getElementById("content");
     var socket = io.connect('http://localhost:3700', {
         'reconnection delay': 2000,
-        'force new connection': true
+        'force new connection': false
     });
+    const cookies = document.cookie.split(/; */); //dopasuje "; " ale też ";"
+    console.log(cookies[0]); //wypisze nazwacookie1=wartosccookie1
 
+    const sessID = cookies[1].split("=")[1];
     socket.on('connect', function () {
-        console.log('connected');
+        console.log("Client connected");
     });
 
 
@@ -16,7 +19,7 @@ window.onload = function () {
     // Funkcja przygotowane do stworzenia lobby
     //-----------------------------------------------
     createLobby.onclick = function () {
-        socket.emit("createLobby", {name: "", message: ""})
+        socket.emit("createLobby", {name: sessID, message: ""})
     };
     //-----------------------------------------------
     //-----------------------------------------------
@@ -42,18 +45,36 @@ window.onload = function () {
     socket.on("eventShowLobbies", function (data) {
         if (data.message) {
             console.log(data.message);
-            var roomsHtml = "";
-            var rooms = data.message.split(",");
-            for (var i = 1; i < rooms.length; i++) {
-                var button = "<a href='game.html'><button class='answers' id='" + i + "'>" + rooms[i] + "</button></a>";
+            let roomsHtml = "";
+            const rooms = data.message.split(",");
+            for (let i = 0; i < rooms.length; i++) {
+                let button = "<button class='lobby' id='" + i + "'>" + rooms[i] + "</button>";
                 roomsHtml += button;
             }
             content.innerHTML = "";
             content.innerHTML = roomsHtml;
+
+            const buttons = document.getElementsByClassName("lobby");
+            for (let j = 0; j < buttons.length; j++) {
+                buttons[j].addEventListener("click", function () {
+                    console.log("click in button");
+                    socket.emit("joinRoom", {name: sessID, message: rooms[j]});
+                });
+            }
         }
 
     });
     //-----------------------------------------------
 
+    //-----------------------------------------------
+    // Funkcja przygotowane do dolaczenia do lobby
+    //-----------------------------------------------
+    socket.on("eventJoinRoom", function (data) {
+        if (data) {
+            console.log("Redirect");
+            document.cookie = "lobbyId=" + data.message + ";";
+            window.location.href = "game.html";
+        }
+    });
 };
 

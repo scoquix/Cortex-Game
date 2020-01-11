@@ -13,7 +13,7 @@ window.onload = function () {
     });
 
     socket.on('connect', function () {
-        console.log('connected');
+        console.log("Client connected");
     });
 
     /*socket.on('message', function (data) {
@@ -58,16 +58,16 @@ window.onload = function () {
             content.innerHTML = html;
             content.scrollTop = content.scrollHeight;
             //redirect
-            console.log("jesetem");
-            window.location.href = "user.html";
-
+            if (data.message !== "Authentication failed") {
+                document.cookie = "sessID=" + data.name + "; ";
+                window.location.href = "user.html";
+            }
         } else {
             console.log("There is a problem:", data);
         }
     });
 
     registerButton.onclick = function () {
-        console.log(name.value)
         if (name.value === "") {
             alert("Please type your name!");
         } else {
@@ -78,7 +78,6 @@ window.onload = function () {
     };
 
     loginButton.onclick = function () {
-        console.log(name.value)
         if (name.value === "") {
             alert("Please type your name!");
         } else {
