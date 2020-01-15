@@ -1,17 +1,19 @@
 package net.io.cortex.model;
 
-public class Validation {
+class Validation {
     static boolean validateLogin(String login) {
-        /*
-         * TO DO
-         */
-        return login.equals("admin");
+        String pattern = "(?=.*[a-z]).{3,}";
+        if (!login.equals("")) {
+            return login.matches(pattern);
+        }
+        return false;
     }
 
     static boolean validatePassword(String password) {
-        /*
-         * TO DO
-         */
-        return true;
+        if (password != null) {
+            String patterns = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
+            return password.matches(patterns);
+        }
+        return false;
     }
 }

@@ -11,10 +11,9 @@ class RegistrationTest {
     @Test
     void register() {
         String id = UUID.randomUUID().toString();
-        Registration registration = new Registration("Ala" + id, "Kot");
+        Registration registration = new Registration("Ala@2" + id, "Kot@2adAAf");
 
         assertTrue(registration.register());
-        assertFalse(registration.register());
 
         Registration regNull = new Registration();
 

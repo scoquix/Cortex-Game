@@ -1,17 +1,29 @@
 package net.io.cortex.model;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class RiddleTest {
-    private Riddle emptyRiddle = new Riddle();
-    private ArrayList<byte[]> answers = new ArrayList<>();
-    private byte[] image = {127, 127};
-    private Riddle riddle = new Riddle("1", answers, image);
+    private static Riddle emptyRiddle;
+    private static ArrayList<byte[]> answers;
+    private static byte[] arr;
+    private static Riddle riddle;
+
+    @BeforeAll
+    static void init() {
+        arr = new byte[]{127, 127};
+        answers = new ArrayList<>();
+        answers.add(arr);
+        emptyRiddle = new Riddle(null, null, null);
+        riddle = new Riddle("1", answers, arr);
+        Riddle defaultRiddle = new Riddle();
+    }
 
     @Test
     void getId() {
@@ -42,11 +54,14 @@ class RiddleTest {
     @Test
     void getRiddleContent() {
         assertNull(emptyRiddle.getRiddleContent());
-        assertNull(riddle.getRiddleContent());
         String content = "Content";
         riddle.setRiddleContent(content);
 
         assertEquals(content, riddle.getRiddleContent(), "getRiddleContent -- failed");
+
+        String encoded = Base64.getEncoder().encodeToString(arr);
+        riddle.setRiddleContent(encoded);
+        assertEquals(encoded, riddle.getRiddleContent(), "Encoded -- failed");
     }
 
     @Test

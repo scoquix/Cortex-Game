@@ -16,11 +16,12 @@ public class Registration {
 
 
     public boolean register() {
-        //CZEKAMY NA CB SEBA XD
-        //Validation.validateLogin(this.getLogin());
-        //Validation.validatePassword(this.getPassword());
-        UserRepositoryMongoImpl userRepositoryMongo = new UserRepositoryMongoImpl();
-        return userRepositoryMongo.create(this);
+        if (login != null && password != null)
+            if (Validation.validateLogin(login) && Validation.validatePassword(password)) {
+                UserRepositoryMongoImpl userRepositoryMongo = new UserRepositoryMongoImpl();
+                return userRepositoryMongo.create(this);
+            }
+        return false;
     }
 
     public String getLogin() {

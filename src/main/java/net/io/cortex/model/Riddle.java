@@ -16,22 +16,28 @@ public class Riddle {
         this.riddleContent = encryptContent(riddleContent);
     }
 
-    public Riddle() {
+    Riddle() {
     }
 
     private String encryptAnswers(ArrayList<byte[]> answers) {
-        StringBuilder answersBuilder = new StringBuilder();
-        for (byte[] answer : answers) {
-            String encodeAnswer = Base64.getEncoder().encodeToString(answer);
-            answersBuilder.append(encodeAnswer);
-            answersBuilder.append("|");
+        if (answers != null) {
+            StringBuilder answersBuilder = new StringBuilder();
+            for (byte[] answer : answers) {
+                String encodeAnswer = Base64.getEncoder().encodeToString(answer);
+                answersBuilder.append(encodeAnswer);
+                answersBuilder.append("|");
+            }
+            answersBuilder.deleteCharAt(answersBuilder.length() - 1);
+            return answersBuilder.toString();
         }
-        answersBuilder.deleteCharAt(answersBuilder.length() - 1);
-        return answersBuilder.toString();
+        return null;
     }
 
     private String encryptContent(byte[] content) {
-        return Base64.getEncoder().encodeToString(content);
+        if (content != null)
+            return Base64.getEncoder().encodeToString(content);
+        else
+            return null;
     }
 
 
