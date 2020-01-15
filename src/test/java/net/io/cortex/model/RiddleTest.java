@@ -2,12 +2,16 @@ package net.io.cortex.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class RiddleTest {
     private Riddle emptyRiddle = new Riddle();
-    private String image = null;
-    private Riddle riddle = new Riddle("1", "image", image);
+    private ArrayList<byte[]> answers = new ArrayList<>();
+    private byte[] image = {127, 127};
+    private Riddle riddle = new Riddle("1", answers, image);
 
     @Test
     void getId() {
@@ -39,10 +43,10 @@ class RiddleTest {
     void getRiddleContent() {
         assertNull(emptyRiddle.getRiddleContent());
         assertNull(riddle.getRiddleContent());
-        String constent = "Content";
-        riddle.setRiddleContent(arr);
+        String content = "Content";
+        riddle.setRiddleContent(content);
 
-        assertEquals(arr, riddle.getRiddleContent(), "getRiddleContent -- failed");
+        assertEquals(content, riddle.getRiddleContent(), "getRiddleContent -- failed");
     }
 
     @Test

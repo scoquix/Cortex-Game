@@ -1,3 +1,4 @@
+
 package net.io.cortex.model;
 
 import java.util.ArrayList;
@@ -13,6 +14,9 @@ public class Riddle {
         this.id = id;
         this.answers = encryptAnswers(answers);
         this.riddleContent = encryptContent(riddleContent);
+    }
+
+    public Riddle() {
     }
 
     private String encryptAnswers(ArrayList<byte[]> answers) {
