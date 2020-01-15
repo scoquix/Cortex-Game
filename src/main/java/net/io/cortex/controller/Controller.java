@@ -191,15 +191,52 @@ public class Controller {
         });
 
         //------------------------------------------------
+        // event do utworzenia pokoju
+        //------------------------------------------------
+        server.addEventListener("deleteLobby", Message.class, (socketIOClient, message, ackRequest) -> {
+            System.out.println("Server odebral event delete lobby");
+            System.out.println(message.getName() + " przesyla odp: " + message.getMessage());
+            System.out.println("getSessionId: " + socketIOClient.getSessionId());
+
+            Lobby lobby = new Lobby(message.getName());
+            UUID uuid = UUID.fromString(message.getName());
+            if (!usersSessionsID.containsKey(uuid))
+                socketIOClient.sendEvent("eventDeleteLobby", new Message("Server", "You are not active user :("));
+            else {
+                lobby.addUser(uuid);
+                lobby.addClient(socketIOClient);
+                boolean hasLobby = false;
+                int indexToDelete = -1;
+                for (int i = 0; i < lobbies.size(); ++i) {
+                    if (lobbies.get(i).getOwner().equals(lobby.getOwner())) {
+                        hasLobby = true;
+                        indexToDelete = i;
+                        break;
+                    }
+                }
+                if (indexToDelete != -1)
+                    lobbies.remove(indexToDelete);
+
+                if (hasLobby) {
+                    System.out.println("Usunieto lobby o nazwie: " + lobby.getOwner());
+                    socketIOClient.sendEvent("eventDeleteLobby", new Message("Server", "Lobby deleted"));
+                } else {
+                    System.out.println("Nie usunieto lobby");
+                    socketIOClient.sendEvent("eventDeleteLobby", new Message("Server", "You do not have any lobby"));
+                }
+            }
+        });
+
+        //------------------------------------------------
         server.addEventListener("joinRoom", Message.class, (socketIOClient, message, ackRequest) -> {
             System.out.println("Server odebral event join room");
             UUID sessID = UUID.fromString(message.getName());
-            UUID lobbID = UUID.fromString(message.getName());
+            UUID lobbyID = UUID.fromString(message.getMessage());
             if (usersSessionsID.containsKey(sessID)) {
                 for (Lobby l : lobbies) {
                     if (l.getOwner().equals(message.getMessage())) {
                         l.addUser(sessID);
-                        socketIOClient.sendEvent("eventJoinRoom", new Message("", sessID.toString()));
+                        socketIOClient.sendEvent("eventJoinRoom", new Message("", lobbyID.toString()));
                         break;
                     }
                 }
@@ -262,6 +299,7 @@ public class Controller {
             System.out.println(l.getOwner() + " " + lobbyId);
             if (l.getOwner().equals(lobbyId.toString())) {
                 for (SocketIOClient s : l.getClients()) {
+                    s.sendEvent("eventTimerStart", new Message("Server", "timer"));
                     s.sendEvent("eventImage", new Message("Server", base64EncodedImage));
                     s.sendEvent("eventAnswers", new Message("Server", encodedAnswers));
                     System.out.println("Odesłałem zagadke na adres: " + s.getSessionId());

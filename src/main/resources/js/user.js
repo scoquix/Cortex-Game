@@ -1,15 +1,20 @@
 window.onload = function () {
-    var showLobbies = document.getElementById("showLobbies");
-    var createLobby = document.getElementById("createLobby");
-    var content = document.getElementById("content");
-    var socket = io.connect('http://localhost:3700', {
+    let showLobbies = document.getElementById("showLobbies");
+    let createLobby = document.getElementById("createLobby");
+    let deleteLobby = document.getElementById("deleteLobby");
+    let content = document.getElementById("content");
+    let socket = io.connect('http://localhost:3700', {
         'reconnection delay': 2000,
         'force new connection': false
     });
     const cookies = document.cookie.split(/; */); //dopasuje "; " ale też ";"
     console.log(cookies[0]); //wypisze nazwacookie1=wartosccookie1
+    let sessID;
+    if (cookies.length > 1)
+        sessID = cookies[1].split("=")[1];
+    else
+        sessID = cookies[0].split("=")[1];
 
-    const sessID = cookies[1].split("=")[1];
     socket.on('connect', function () {
         console.log("Client connected");
     });
@@ -22,6 +27,11 @@ window.onload = function () {
         socket.emit("createLobby", {name: sessID, message: ""})
     };
     //-----------------------------------------------
+    // Funkcja przygotowane do usuniecia lobby
+    //-----------------------------------------------
+    deleteLobby.onclick = function () {
+        socket.emit("deleteLobby", {name: sessID, message: ""})
+    };
     //-----------------------------------------------
     // Funkcja przygotowane do wyswietlenia lobbies
     //-----------------------------------------------
@@ -36,6 +46,16 @@ window.onload = function () {
     socket.on("eventCreateLobby", function (data) {
         if (data.message) {
             alert(data.message);
+        }
+    });
+    //-----------------------------------------------
+    // Funkcja przygotowane do komunikatu o usunieciu lobby
+    //-----------------------------------------------
+    socket.on("eventDeleteLobby", function (data) {
+        if (data.message) {
+            alert(data.message);
+            socket.emit("showLobbies", {name: "", message: ""});
+            document.cookie = "lobbyId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/Cortex;"
         }
     });
 
@@ -61,6 +81,8 @@ window.onload = function () {
                     socket.emit("joinRoom", {name: sessID, message: rooms[j]});
                 });
             }
+        } else {
+            content.innerHTML = "";
         }
 
     });
