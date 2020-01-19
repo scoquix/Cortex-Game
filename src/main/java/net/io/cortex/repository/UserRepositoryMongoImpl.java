@@ -50,14 +50,17 @@ public class UserRepositoryMongoImpl implements UserRepository {
     }
 
     @Override
-    public Optional<String> findByName(String name) {
-        if (StringUtils.isBlank(name)) {
+    public Optional<String> findByName(String username, String pass) {
+        if (StringUtils.isBlank(username)) {
             return Optional.empty();
         }
         MongoCollection<Document> collection = openMongoDbCollection("test");
-        Document myDoc = collection.find(eq("name", name)).first();
+        Document myDoc = collection.find(eq("name", username)).first();
+
+        mongoClient.close();
         if (Optional.ofNullable(myDoc).isPresent()) {
-            mongoClient.close();
+            if (!myDoc.containsValue(pass))
+                return Optional.empty();
             return Optional.ofNullable(myDoc.toJson());
         } else {
             return Optional.empty();
@@ -71,7 +74,7 @@ public class UserRepositoryMongoImpl implements UserRepository {
         this.user = user;
         if (user != null) {
             MongoCollection<Document> collection = openMongoDbCollection("test");
-            if (findByName(user.getLogin()).isPresent()) {
+            if (findByName(user.getLogin(), user.getPassword()).isPresent()) {
                 collection.deleteOne(eq("name", user.getLogin()));
                 result = true;
             }
@@ -101,7 +104,7 @@ public class UserRepositoryMongoImpl implements UserRepository {
         Document doc = new Document("name", user.getLogin())
                 .append("password", user.getPassword())
                 .append("type", (user.getLogin().equals("admin")) ? "admin" : "user");
-        Optional<String> userInBase = findByName(user.getLogin());
+        Optional<String> userInBase = findByName(user.getLogin(), user.getPassword());
 
         if (userInBase.isPresent())
             return false;
@@ -116,7 +119,7 @@ public class UserRepositoryMongoImpl implements UserRepository {
             return false;
         else if (newUser.getLogin() == null || newUser.getPassword() == null)
             return false;
-        else if (findByName(oldUser.getLogin()).equals(Optional.empty()))
+        else if (Optional.empty().equals(findByName(oldUser.getLogin(), oldUser.getPassword())))
             return false;
         MongoCollection<Document> collection = openMongoDbCollection("test");
         Document oldDoc = new Document("name", oldUser.getLogin())

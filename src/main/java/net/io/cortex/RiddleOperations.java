@@ -12,6 +12,11 @@ import java.util.Optional;
 import java.util.Random;
 
 public class RiddleOperations {
+    /**
+     * @param filePath
+     * @return
+     * @throws Exception
+     */
     private static byte[] createInputStream(String filePath) throws Exception {
         File file = new File(filePath);
         int size = (int) file.length();
@@ -22,6 +27,11 @@ public class RiddleOperations {
         return buffer;
     }
 
+    /**
+     *
+     * @param filePath
+     * @return
+     */
     private static FileInputStream createInputStream2(String filePath) {
         File file = new File(filePath);
         int size = (int) file.length();
@@ -37,7 +47,10 @@ public class RiddleOperations {
         return in;
     }
 
-
+    /**
+     *
+     * @return
+     */
     public static String downloadImageFromMongoDB() {
         MongoClient mongoClient = new MongoClient("localhost", 27017);
         //Riddle riddle = new Riddle(listOfFiles[i].getName(),answers,imageBytes);
@@ -49,6 +62,10 @@ public class RiddleOperations {
         return image.orElse(null);
     }
 
+    /**
+     *
+     * @return
+     */
     public static String downloadRiddleFromMongoDB() {
         MongoClient mongoClient = new MongoClient("localhost", 27017);
         //Riddle riddle = new Riddle(listOfFiles[i].getName(),answers,imageBytes);
@@ -79,6 +96,10 @@ public class RiddleOperations {
         mongoClient.close();
     }
 
+    /**
+     *
+     * @param directory
+     */
     private static void uploadRiddle(File directory) {
         byte[] imageBytes = null;
         ArrayList<byte[]> answers = new ArrayList<>();
@@ -100,6 +121,11 @@ public class RiddleOperations {
         riddleRepositoryMongo.create(riddle);
     }
 
+    /**
+     *
+     * @param listOfFile
+     * @return
+     */
     private static byte[] convertToBytes(File listOfFile) {
         File file = new File(String.valueOf(listOfFile));
         String absolutePath = file.getAbsolutePath();

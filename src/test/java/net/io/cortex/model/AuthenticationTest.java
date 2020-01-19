@@ -40,10 +40,10 @@ class AuthenticationTest {
         String id = UUID.randomUUID().toString();
         Authentication authentication = new Authentication("1", "Ala" + id, "Kot");
 
-        //assertFalse(authentication.logging());
+        assertFalse(authentication.logging());
 
-        authentication.setLogin("Ala");
-        authentication.setPassword("Kot");
+        authentication.setLogin("bbb");
+        authentication.setPassword("bbb");
         assertTrue(authentication.logging());
 
         Authentication regNull = new Authentication();

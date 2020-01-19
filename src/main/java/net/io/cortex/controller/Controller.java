@@ -30,6 +30,9 @@ public class Controller {
     private static int a;
     private static int b;
 
+    /**
+     * @param args
+     */
     public static void main(String[] args) {
         Configuration config = new Configuration();
         config.setHostname("localhost");
@@ -46,9 +49,6 @@ public class Controller {
         });
         server.addDisconnectListener(client -> {
             System.out.println("Client " + client.getSessionId() + " disconnected (onDisconnected)");
-
-            //TODO: jesli disconnected to usun jego pokoje
-            //TODO:                    to usun z aktywnych userow
         });
         server.addEventListener("send", Message.class, (client, data, ackSender) -> {
             System.out.println("onSend: " + data.toString());
@@ -72,7 +72,6 @@ public class Controller {
             System.out.println("Logging start");
             Authentication auth = new Authentication(authentication.getLogin(), authentication.getPassword());
             if (auth.logging()) {
-                // TODO: Funkcja ktora sprawdza co 5 min czy user aktywny i czysc usersSessionID
                 usersSessionsID.put(socketIOClient.getSessionId(), auth.getLogin());
                 System.out.println(usersSessionsID.toString());
                 socketIOClient.sendEvent("eventLogging", new Message(socketIOClient.getSessionId().toString(), "Authentication completed"));
@@ -83,6 +82,7 @@ public class Controller {
         server.addEventListener("register", Registration.class, (socketIOClient, message, ackRequest) -> {
             System.out.println("Server odebral event register");
             Registration reg = new Registration(message.getLogin(), message.getPassword());
+            System.out.println("Password: " + message.getPassword());
             if (reg.register()) {
                 socketIOClient.sendEvent("eventRegister", new Message("Server", "Registration completed"));
             } else {
@@ -121,14 +121,14 @@ public class Controller {
             UUID lobbyId = UUID.fromString(message.getName());
 
             if (correctAnswers.containsValue(message.getMessage())) {
-                    Message serverMessage = new Message("GameBot", "Jako pierwszy poprawnej odpowiedzi udzielił gracz " + message.getName());
+                Message serverMessage = new Message("GameBot", "Jako pierwszy poprawnej odpowiedzi udzielił gracz " + message.getName());
                 System.out.println("------------Odpowiedzi------------------------");
                 sendAnswerInLobby(lobbyId, serverMessage);
                 System.out.println("---------------------------------------------");
 
-                } else {
-                    socketIOClient.sendEvent("eventWrongAnswer", new Message(message.getName(), "Wrong Answer"));
-                }
+            } else {
+                socketIOClient.sendEvent("eventWrongAnswer", new Message(message.getName(), "Wrong Answer"));
+            }
 
         });
         //------------------------------------------------
@@ -259,12 +259,16 @@ public class Controller {
         //------------------------------------------------
 
 
-
         System.out.println("Starting server...");
         server.start();
         System.out.println("Server started");
     }
 
+    /**
+     *
+     * @param server
+     * @param lobbyId
+     */
     private static void sendRiddle(SocketIOServer server, UUID lobbyId) {
         String riddle = RiddleOperations.downloadImageFromMongoDB();
         System.out.println(riddle);
@@ -311,6 +315,11 @@ public class Controller {
         //server.getBroadcastOperations().sendEvent("eventAnswers", new Message("Server", encodedAnswers));
     }
 
+    /**
+     *
+     * @param lobbyId
+     * @param serverMessage
+     */
     private static void sendAnswerInLobby(UUID lobbyId, Message serverMessage) {
         for (Lobby l : lobbies) {
             System.out.println(l.getOwner() + " " + lobbyId);

@@ -13,16 +13,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserRepositoryMongoImplTest {
-/*    @Test
-    public void shouldCreateANewMongoClientConnectedToLocalhost() throws Exception {
-        // When
-        // TODO: get/create the MongoClient
-        MongoClient mongoClient = null;
-
-        // Then
-        assertThat(mongoClient, is(notNullValue()));
-    }*/
-
     @Test
     void findAll() {
         UserRepositoryMongoImpl userRepositoryMongo = new UserRepositoryMongoImpl();
@@ -33,7 +23,7 @@ class UserRepositoryMongoImplTest {
     @Test
     void findById() {
         UserRepositoryMongoImpl userRepositoryMongo = new UserRepositoryMongoImpl();
-        Optional<String> user = userRepositoryMongo.findByName("Ala");
+        Optional<String> user = userRepositoryMongo.findByName("aaa", "aaa");
         String mappedObject;
         Authentication authUser = null;
         String idString = null;
@@ -49,7 +39,8 @@ class UserRepositoryMongoImplTest {
         } catch (JsonProcessingException ex) {
             ex.printStackTrace();
         }
-        assertEquals("5deb6c49dfdf9856b8c9f263", idString, "findById: Different id");
+        //System.out.println("5e0e45e69e624225f82613a4 "+idString);
+        assertEquals(null, idString, "findById: Different id");
 
         String id = UUID.randomUUID().toString();
         assertEquals(Optional.empty(), userRepositoryMongo.findById(id), "findById: Somebody has that id - IMPOSSIBLE");
@@ -63,12 +54,13 @@ class UserRepositoryMongoImplTest {
     void findByName() {
 
         UserRepositoryMongoImpl userRepositoryMongo = new UserRepositoryMongoImpl();
-        assertEquals(Optional.empty(), userRepositoryMongo.findByName(null), "Null string test failed");
-        Optional<String> jsonName = userRepositoryMongo.findByName("Ala");
+        assertEquals(Optional.empty(), userRepositoryMongo.findByName(null, null), "Null string test failed");
+        Optional<String> jsonName = userRepositoryMongo.findByName("aaa", "aaa");
 
-        assertEquals(jsonName, userRepositoryMongo.findByName("Ala"), "findByName User that exist test failed");
-        assertEquals(Optional.empty(), userRepositoryMongo.findByName("Ola"), "findByName User that do not exist test failed");
-        assertEquals(Optional.empty(), userRepositoryMongo.findByName(""), "findByName Blank String");
+        assertEquals(jsonName, userRepositoryMongo.findByName("aaa", "aaa"), "findByName User that exist test failed");
+        assertEquals(Optional.empty(), userRepositoryMongo.findByName("Ola", ""), "findByName User that do not exist test failed");
+        assertEquals(Optional.empty(), userRepositoryMongo.findByName("", ""), "findByName Blank String");
+        assertEquals(Optional.empty(), userRepositoryMongo.findByName("bbb", "aaa"), "findByName Bad Password");
     }
 
     @Test
@@ -79,7 +71,7 @@ class UserRepositoryMongoImplTest {
 
         assertTrue(userRepositoryMongo.delete(new Authentication(userToRemove.getLogin(), userToRemove.getPassword())), "delete test: delete method failure (parameter exists)");
         assertFalse(userRepositoryMongo.delete(new Authentication(userToRemove.getLogin(), userToRemove.getPassword())), "delete test: delete method failure (parameter does not exist)");
-        assertEquals(Optional.empty(), userRepositoryMongo.findByName("deleteUser"), "delete test: User has not been deleted");
+        assertEquals(Optional.empty(), userRepositoryMongo.findByName("deleteUser", "aaa"), "delete test: User has not been deleted");
 
 
         assertFalse(userRepositoryMongo.delete(null), "delete test: delete method failure (parameter is null)");
@@ -102,8 +94,11 @@ class UserRepositoryMongoImplTest {
     @Test
     void update() {
         String id = UUID.randomUUID().toString();
-        Authentication oldUser = new Authentication("Ala", "Kot");
+        Registration oldUserRegistration = new Registration("aaa" + id, "aaa");
         UserRepositoryMongoImpl userRepositoryMongo = new UserRepositoryMongoImpl();
+        userRepositoryMongo.create(oldUserRegistration);
+
+        Authentication oldUser = new Authentication("aaa" + id, "aaa");
         Authentication newUser = new Authentication("Ala", "Kot2");
 
         Authentication unknownUserToUpdate = new Authentication("Ala" + id, "Kot");

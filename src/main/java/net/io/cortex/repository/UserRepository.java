@@ -11,7 +11,7 @@ public interface UserRepository {
 
     Optional<String> findById(String id);
 
-    Optional<String> findByName(String id);
+    Optional<String> findByName(String id, String pass);
 
     boolean delete(Authentication user);
 
