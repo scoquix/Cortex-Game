@@ -19,6 +19,10 @@ public class UserRepositoryMongoImpl implements UserRepository {
     private Authentication user;
     private MongoClient mongoClient;
     @Override
+    /*
+     *
+     * @return - list
+     */
     public List<String> findAll() {
         MongoCollection<Document> collection = openMongoDbCollection("test");
         List<String> allUsers = new ArrayList<>();
@@ -34,6 +38,11 @@ public class UserRepositoryMongoImpl implements UserRepository {
     }
 
     @Override
+    /*
+     *
+     * @param id - id to find
+     * @return - optional
+     */
     public Optional<String> findById(String id) {
         // TODO: dodanie ID dla kazdego usera
         //        if (StringUtils.isBlank(id)) {
@@ -50,6 +59,12 @@ public class UserRepositoryMongoImpl implements UserRepository {
     }
 
     @Override
+    /*
+     *
+     * @param username - user to find
+     * @param pass - password
+     * @return - optional
+     */
     public Optional<String> findByName(String username, String pass) {
         if (StringUtils.isBlank(username)) {
             return Optional.empty();
@@ -69,6 +84,11 @@ public class UserRepositoryMongoImpl implements UserRepository {
     }
 
     @Override
+    /*
+     *
+     * @param user - user to delete
+     * @return - bool
+     */
     public boolean delete(Authentication user) {
         boolean result = false;
         this.user = user;
@@ -84,6 +104,11 @@ public class UserRepositoryMongoImpl implements UserRepository {
     }
 
     @Override
+    /*
+     *
+     * @param user - user to create
+     * @return - bool
+     */
     public boolean create(Registration user) {
         if (user == null)
             return false;
@@ -114,6 +139,12 @@ public class UserRepositoryMongoImpl implements UserRepository {
     }
 
     @Override
+    /*
+     *
+     * @param oldUser - oldUser's data
+     * @param newUser - newUser's data
+     * @return - bool
+     */
     public boolean update(Authentication oldUser, Authentication newUser) {
         if (oldUser == null || newUser == null)
             return false;
@@ -131,6 +162,12 @@ public class UserRepositoryMongoImpl implements UserRepository {
         mongoClient.close();
         return true;
     }
+
+    /*
+     *
+     * @param name - collection's name
+     * @return - doc
+     */
     private MongoCollection<Document> openMongoDbCollection(String name) {
         mongoClient = new MongoClient("localhost", 27017);
         MongoDatabase database = mongoClient.getDatabase("cortex_db");

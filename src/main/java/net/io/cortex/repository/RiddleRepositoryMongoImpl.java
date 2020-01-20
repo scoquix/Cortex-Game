@@ -17,6 +17,10 @@ import static com.mongodb.client.model.Filters.eq;
 public class RiddleRepositoryMongoImpl implements RiddleRepository {
     private MongoClient mongoClient;
     @Override
+    /*
+     * @param name - name to find
+     * @return - optional
+     */
     public Optional<String> findByName(String name) {
         if (StringUtils.isBlank(name)) {
             return Optional.empty();
@@ -33,6 +37,10 @@ public class RiddleRepositoryMongoImpl implements RiddleRepository {
     }
 
     @Override
+    /*
+     * @param riddle - riddle to create
+     * @return - bool
+     */
     public boolean create(Riddle riddle) {
         if (riddle == null)
             return false;
@@ -64,6 +72,11 @@ public class RiddleRepositoryMongoImpl implements RiddleRepository {
 
 
     @Override
+    /*
+     * @param oldRiddle - oldRiddle's data
+     * @param newRiddle - newRiddle's data
+     * @return - bool
+     */
     public boolean update(Riddle oldRiddle, Riddle newRiddle) {
         if (oldRiddle == null || newRiddle == null) {
             mongoClient.close();
@@ -91,6 +104,10 @@ public class RiddleRepositoryMongoImpl implements RiddleRepository {
     }
 
     @Override
+    /*
+     * @param riddle - riddle to delete
+     * @return - bool
+     */
     public boolean delete(Riddle riddle) {
         boolean result = false;
         if (riddle != null) {
@@ -104,6 +121,10 @@ public class RiddleRepositoryMongoImpl implements RiddleRepository {
     }
 
     @Override
+    /*
+     *
+     * @return - list of string
+     */
     public List<String> findAll() {
         MongoCollection<Document> collection = openMongoDbCollection("riddles");
         List<String> allRiddles = new ArrayList<>();
@@ -117,6 +138,11 @@ public class RiddleRepositoryMongoImpl implements RiddleRepository {
         return allRiddles;
     }
 
+    /*
+     *
+     * @param name - collection's name
+     * @return - doc
+     */
     private MongoCollection<Document> openMongoDbCollection(String name) {
         mongoClient = new MongoClient("localhost", 27017);
         MongoDatabase database = mongoClient.getDatabase("cortex_db");

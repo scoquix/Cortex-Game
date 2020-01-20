@@ -16,23 +16,44 @@ public class Message {
     public Message() {
     }
 
+    /**
+     *
+     * @param name - message's name
+     * @param message - string
+     */
     public Message(String name, String message) {
         this.name = name;
         this.message = message;
     }
 
+    /**
+     *
+     * @return - string
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @param name - name setter
+     */
     void setName(String name) {
         this.name = name;
     }
 
+    /**
+     *
+     * @return - string
+     */
     public String getMessage() {
         return message;
     }
 
+    /**
+     *
+     * @param message - message setter
+     */
     void setMessage(String message) {
         this.message = message;
     }
